@@ -1,29 +1,13 @@
-# README #
+# power-change-alert
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Summary
 
-### What is this repository for? ###
+This is a Windows Service project that will send an email alert as the host powers on/off and drops in/out of battery power.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+The intent is to have a notification when power is lost on a known electricl circuit.  It assumed that the host is a laptop or a system that Windows is aware of battery management, and that the on-prem networking will still have power (via UPS) when the host loses wall-power.
 
-### How do I get set up? ###
+## Technologies
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+* Visual Studio 2019
+* C# Windows Service
+* Gmail Integration
