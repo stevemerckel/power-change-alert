@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerChangeAlerter", "PowerChangeAlerter\PowerChangeAlerter.csproj", "{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerChangeAlerter.Common", "PowerChangeAlerter.Common\PowerChangeAlerter.Common.csproj", "{BE3403D6-2765-48C1-BFE7-E890B27C03C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerChangeAlerter.Sandbox", "PowerChangeAlerter.Sandbox\PowerChangeAlerter.Sandbox.csproj", "{97F39495-CD99-48CF-87ED-EBCB2EBD7459}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4CB0ED22-63BF-44AF-B781-98879BB2F865}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,20 @@
+{
+    "Serilog": {
+        "Using": [ "Serilog.Sinks.Console" ],
+        "MinimumLevel": "Information",
+        "WriteTo": [
+            {
+                "Name": "Console"
+            },
+            {
+                "Name": "File",
+                "Args": {
+                    "path": "log_.txt",
+                    "rollingInterval": "Day",
+                    "outputTemplate": "{Timestamp:HH:mm:ss} {Level:u3} [{ThreadId}]:  {Message:lj}{NewLine}{Exception}"
+                }
+            }
+        ],
+        "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+    }
+}

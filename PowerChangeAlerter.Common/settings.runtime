@@ -1,0 +1,11 @@
+﻿{
+    "EmailSenderName": "",
+    "EmailSenderAddress": "",
+    "EmailRecipientName": "",
+    "EmailRecipientAddress": "",
+    "EmailSmtpServer": "",
+    "EmailSmtpPort": 42,
+    "EmailSmtpUseSsl": true,
+    "EmailSmtpLogonName": "",
+    "EmailSmtpLogonPassword": ""
+}
