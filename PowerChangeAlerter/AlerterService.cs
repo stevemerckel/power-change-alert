@@ -5,6 +5,7 @@ using System.ServiceProcess;
 using System.Text;
 using PowerChangeAlerter.Common;
 using System.Threading;
+using System.Management;
 
 namespace PowerChangeAlerter
 {
@@ -20,6 +21,7 @@ namespace PowerChangeAlerter
         private readonly object _lock = new object();
         private readonly Timer _uptimeTimer;
         private bool _isFirstUptimeLogged = false;
+        private PowerModes _currentPowerMode = PowerModes.Resume;
 
         public AlerterService(IRuntimeSettings runtimeSettings, IAppLogger logger, IFileManager fileManager)
         {
@@ -34,6 +36,12 @@ namespace PowerChangeAlerter
             _uptimeDelayInMinutes = runtimeSettings.IsLocalDebugging ? 1 : 20;
             _uptimeTimer = new Timer(LogUptime);
             _uptimeTimer.Change(0, (int)TimeSpan.FromMinutes(_uptimeDelayInMinutes).TotalMilliseconds);
+
+            // report battery presence
+            if (IsBatteryAvailable())
+                _logger.Info("Battery was found");
+            else
+                _logger.Warn("No battery was found, so changes in power state will not be reported");
         }
 
         private void LogUptime(object state)
@@ -42,11 +50,40 @@ namespace PowerChangeAlerter
             {
                 _logger.Info($"{nameof(LogUptime)} initialized!");
                 _isFirstUptimeLogged = true;
+                DumpBatteryInfo();
                 return;
             }
 
             _uptimeMinutesCount += _uptimeDelayInMinutes;
             _logger.Info($"{nameof(LogUptime)} running for {_uptimeMinutesCount} minutes");
+            DumpBatteryInfo();
+        }
+
+        private bool IsBatteryAvailable()
+        {
+            ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_Battery");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            ManagementObjectCollection collection = searcher.Get();
+            return collection.Count > 0;
+        }
+
+        private void DumpBatteryInfo()
+        {
+            PowerBroadcastStatus pbs = new PowerBroadcastStatus();
+            _logger.Info($"{nameof(pbs)} = {pbs}");
+            // dump WMI information from battery
+            _logger.Info("Fetching battery info via WMI");
+            ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_Battery");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            ManagementObjectCollection collection = searcher.Get();
+            _logger.Info($"Found {collection.Count} element(s) in WMI collection");
+            foreach (ManagementObject mo in collection)
+            {
+                foreach (PropertyData property in mo.Properties)
+                {
+                    _logger.Info($"Property {property.Name}: Value is {property.Value}");
+                }
+            }
         }
 
         private void HandleTimeChanged(object sender, EventArgs e)
@@ -61,12 +98,16 @@ namespace PowerChangeAlerter
                 _stopWatch.Start();
             }
 
+            const int ThresholdInSeconds = 5;
             int deltaSeconds = Math.Abs((int)shouldBe.Subtract(DateTime.Now).TotalSeconds);
-            if (deltaSeconds < 5)
+            if (deltaSeconds < ThresholdInSeconds)
+            {
+                _logger.Info($"An insignificant time change was detected (less than {ThresholdInSeconds} seconds)");
                 return;
+            }
 
             var msg = $"{nameof(HandleTimeChanged)} from {shouldBe} to {DateTime.Now:MM/dd/yyyy hh:mm:ss tt}";
-            _logger.Info(msg);
+            _logger.Warn(msg);
         }
 
         private void HandleUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -81,15 +122,30 @@ namespace PowerChangeAlerter
 
         private void HandlePowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
-            _logger.Info($"{nameof(HandlePowerModeChanged)} triggered: {e.Mode}");
+            if (!IsBatteryAvailable())
+                _logger.Warn($"{nameof(HandlePowerModeChanged)} was triggered but there is no connected battery... wtf??");
 
-            // todo: decide how to 
+            _logger.Info($"{nameof(HandlePowerModeChanged)} triggered: {e.Mode}");
+            switch (e.Mode)
+            {
+                case PowerModes.Resume:
+                    // online state resumed
+                    break;
+                case PowerModes.StatusChange:
+                    // status changed from AC to battery or vice-versa
+                    break;
+                case PowerModes.Suspend:
+                    // going into suspended power mode
+                    break;
+            }
+
+            _currentPowerMode = e.Mode;
         }
 
         public void StartService()
         {
             // bind to system events
-            SystemEvents.PowerModeChanged += HandlePowerModeChanged;
+            SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(HandlePowerModeChanged); //HandlePowerModeChanged;
             SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
             SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
             SystemEvents.TimeChanged += HandleTimeChanged;
@@ -157,7 +213,7 @@ namespace PowerChangeAlerter
 
         protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
         {
-            _logger.Warn($"Entered {nameof(OnPowerEvent)}({powerStatus})");
+            _logger.Warn($"Entered {nameof(OnPowerEvent)} -- {nameof(PowerBroadcastStatus)}={powerStatus}");
             return base.OnPowerEvent(powerStatus);
         }
 
