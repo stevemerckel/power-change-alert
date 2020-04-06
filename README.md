@@ -11,3 +11,8 @@ The intent is to have a notification when power is lost on a known electricl cir
 * Visual Studio 2019
 * C# Windows Service
 * Gmail Integration
+
+## NuGet Packages
+
+* Serilog
+* Newtonsoft JSON
