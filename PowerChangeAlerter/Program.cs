@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 using PowerChangeAlerter.Common;
 
 namespace PowerChangeAlerter
@@ -16,20 +18,25 @@ namespace PowerChangeAlerter
             IFileManager fm = new LocalFileManager();
             var targetService = new AlerterService(rs, logger, fm);
 
-            if (rs.IsLocalDebugging)
+            if (rs.IsLocalDebugging  || (args.Length == 1 && args[0].Trim().ToUpper().Contains("CLI")))
             {
-                logger.Info("  ***  Running with debugging within Visual Studio  ***  ");
+                // running as console app, and perhaps with a debugger attached
+                var startupMessage = rs.IsLocalDebugging
+                    ? "Running with debugging within Visual Studio"
+                    : "Running as commandline application manually";
+                logger.Info($"  ***  {startupMessage}  ***  ");
                 targetService.StartService();
-                logger.Info("  ***  Press ENTER key to stop program  ***  ");
-                Console.Read();
-                targetService.StopService();
-                return;
-            }
-
-            if (args.Length == 1 && args[0].Trim().ToUpper().Contains("CLI"))
-            {
-                logger.Info("  ***  Running as commandline application manually  ***  ");
-                targetService.StartService();
+                Task.Run(() =>
+                {
+                    targetService.TriggerStandby();
+                    Thread.Sleep(5000);
+                    targetService.TriggerResume();
+                    Thread.Sleep(5000);
+                    targetService.TriggerAcToBattery();
+                    Thread.Sleep(5000);
+                    targetService.TriggerBatteryToAc();
+                    logger.Info("Done with Power tests");
+                });
                 logger.Info("  ***  Press ENTER key to stop program  ***  ");
                 Console.Read();
                 targetService.StopService();
@@ -38,8 +45,7 @@ namespace PowerChangeAlerter
 
             if (args.Length > 0)
             {
-                logger.Info(@"Unsure how to start.  Either run as an established Windows Service, or use the ""-cli"" switch (without quotes) to run as console application.");
-                Console.ReadLine();
+                logger.Error(@"Unsure how to start.  Either run as an established Windows Service, or use the ""-cli"" switch (without quotes) to run as console application.");
                 return;
             }
 

@@ -50,13 +50,13 @@ namespace PowerChangeAlerter
             {
                 _logger.Info($"{nameof(LogUptime)} initialized!");
                 _isFirstUptimeLogged = true;
-                DumpBatteryInfo();
+                DumpPowerInfo();
                 return;
             }
 
             _uptimeMinutesCount += _uptimeDelayInMinutes;
             _logger.Info($"{nameof(LogUptime)} running for {_uptimeMinutesCount} minutes");
-            DumpBatteryInfo();
+            DumpPowerInfo();
         }
 
         private bool IsBatteryAvailable()
@@ -67,10 +67,11 @@ namespace PowerChangeAlerter
             return collection.Count > 0;
         }
 
-        private void DumpBatteryInfo()
+        private void DumpPowerInfo()
         {
             PowerBroadcastStatus pbs = new PowerBroadcastStatus();
             _logger.Info($"{nameof(pbs)} = {pbs}");
+
             // dump WMI information from battery
             _logger.Info("Fetching battery info via WMI");
             ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_Battery");
@@ -133,6 +134,8 @@ namespace PowerChangeAlerter
                     break;
                 case PowerModes.StatusChange:
                     // status changed from AC to battery or vice-versa
+                    var pbs = new PowerBroadcastStatus();
+                    _logger.Info($"{nameof(HandlePowerModeChanged)} received {e.Mode} -- current {nameof(PowerBroadcastStatus)} is {pbs}");
                     break;
                 case PowerModes.Suspend:
                     // going into suspended power mode
@@ -185,6 +188,26 @@ namespace PowerChangeAlerter
         public void Continue()
         {
             OnContinue();
+        }
+
+        public void TriggerResume()
+        {
+            OnPowerEvent(PowerBroadcastStatus.ResumeSuspend);
+        }
+
+        public void TriggerBatteryToAc()
+        {
+            OnPowerEvent(PowerBroadcastStatus.PowerStatusChange);
+        }
+
+        public void TriggerAcToBattery()
+        {
+            OnPowerEvent(PowerBroadcastStatus.PowerStatusChange);
+        }
+
+        public void TriggerStandby()
+        {
+            OnPowerEvent(PowerBroadcastStatus.Suspend);
         }
 
         protected override void OnStart(string[] args)
