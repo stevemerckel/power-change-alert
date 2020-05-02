@@ -17,8 +17,9 @@ namespace PowerChangeAlerter
             IAppLogger logger = new SerilogAppLogger(rs);
             IFileManager fm = new LocalFileManager();
             var targetService = new AlerterService(rs, logger, fm);
+            const string CommandlineSwitchArg = "CLI";
 
-            if (rs.IsLocalDebugging  || (args.Length == 1 && args[0].Trim().ToUpper().Contains("CLI")))
+            if (rs.IsLocalDebugging  || (args.Length == 1 && args[0].Trim().ToUpper().Contains(CommandlineSwitchArg)))
             {
                 // running as console app, and perhaps with a debugger attached
                 var startupMessage = rs.IsLocalDebugging
@@ -45,7 +46,7 @@ namespace PowerChangeAlerter
 
             if (args.Length > 0)
             {
-                logger.Error(@"Unsure how to start.  Either run as an established Windows Service, or use the ""-cli"" switch (without quotes) to run as console application.");
+                logger.Error($"Unsure how to start.  Either run as an established Windows Service, or use the '{CommandlineSwitchArg}' switch (without quotes) to run as console application.");
                 return;
             }
 

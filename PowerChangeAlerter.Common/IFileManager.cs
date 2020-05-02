@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PowerChangeAlerter.Common
 {
@@ -60,5 +61,13 @@ namespace PowerChangeAlerter.Common
         /// If file cannot be found or has an error getting the version, then NULL will be returned.
         /// </remarks>
         Version GetAssemblyVersion(string fileLocation);
+
+        /// <summary>
+        /// Returns a list of file paths (if any) based on the <paramref name="fileNamePattern"/> that are found in the <paramref name="rootDirectory"/> and any sub-directories.
+        /// </summary>
+        /// <param name="rootDirectory">Root directory to search</param>
+        /// <param name="fileNamePattern">Pattern for file name to search (think of CMD search options)</param>
+        /// <returns>Matches found (if any)</returns>
+        List<string> GetFilesByPattern(string rootDirectory, string fileNamePattern);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Trinet.Core.IO.Ntfs;
 
@@ -72,6 +74,12 @@ namespace PowerChangeAlerter.Common
             }
 
             return version;
+        }
+
+        /// <inheritdoc />
+        public List<string> GetFilesByPattern(string rootDirectory, string fileNamePattern)
+        {
+            return Directory.EnumerateFiles(rootDirectory, fileNamePattern, SearchOption.AllDirectories).ToList();
         }
     }
 }
