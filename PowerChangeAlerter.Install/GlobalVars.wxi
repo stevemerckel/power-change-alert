@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?define ProductName="Power Change Alerter" ?>
+  <?define CreatedBy="Steve Merckel" ?>
+  <?define ServiceRegistrationName="SystemAlerterSM" ?>
+  <?define Version=!(bind.FileVersion.PowerChangeAlerter.exe) ?>
+  <?if $(var.Configuration) = "Release" ?>
+    <?define BuildMode="" ?>
+  <?else ?>
+    <?define BuildMode=" ($(var.Configuration) Build)" ?>
+  <?endif ?>
+</Include>

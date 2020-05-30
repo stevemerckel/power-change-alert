@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <?include GlobalVars.wxi ?>
+
+    <!--xmlns:complus="http://schemas.microsoft.com/wix/ComPlusExtension"-->
+
+    <!-- change Version as needed -->
+    <Product Id="*"
+             Name="$(var.ProductName) $(var.Version)$(var.BuildMode)"
+             Language="1033"
+             Version="$(var.Version)"
+             Manufacturer="$(var.CreatedBy)"
+             UpgradeCode="{CD7142EF-6494-43C8-B1CB-C601136D42B1}">
+
+        <Package InstallerVersion="200" Compressed="yes" />
+
+        <!-- Prevents installation on 32-bit machines -->
+        <Condition Message="This application is supported only on 64-bit Windows installations.">
+            <![CDATA[Installed OR (VersionNT64 >= 601)]]>
+        </Condition>
+
+        <Property Id="ALLUSERS" Value="1" />
+
+        <!-- always going to remove previous and install new for upgrades -->
+        <Upgrade Id="{8A654398-41B2-4EA4-A932-ED8F49E107CB}">
+            <UpgradeVersion Minimum="1.0.0.0"
+                            Maximum="99.0.0.0"
+                            Property="PREVIOUSVERSIONSINSTALLED"
+                            IncludeMinimum="yes"
+                            IncludeMaximum="no" />
+        </Upgrade>
+
+        <InstallExecuteSequence>
+            <RemoveExistingProducts Before="InstallInitialize"/>
+        </InstallExecuteSequence>
+
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high" />
+
+        <!-- App icon definition -->
+        <!--<Icon Id="ProgramIcon" SourceFile="something.ico" />
+        <Property Id="ARPPRODUCTICON" Value="ProgramIcon" />-->
+
+        <!-- Manual set of install size, to prevent possible flawed calculation by installer -->
+        <Property Id="ARPSIZE" Value="5000" />
+
+        <Property Id="APPLICATIONFOLDER">
+            <RegistrySearch Key="SOFTWARE\$(var.CreatedBy)\$(var.ProductName)" Root="HKLM" Type="raw" Id="APPLICATIONFOLDER_REGSEARCH" Name="Path" />
+        </Property>
+
+        <!-- Program directory structure -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLLOCATION" Name="AlerterSystemSM">
+                    <Component Id="CleanupMainApplicationFolder" Guid="*">
+                        <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.CreatedBy)\$(var.ProductName)" Name="Path" Type="string" Value="[INSTALLLOCATION]" KeyPath="yes" />
+                        <!-- We need to use INSTALLLOCATION variable here or RemoveFolderEx will not remove on "install". -->
+                        <util:RemoveFolderEx On="uninstall" Property="INSTALLLOCATION" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <!-- Installation Root Folder -->
+        <DirectoryRef Id="INSTALLLOCATION">
+
+            <Component Id="Microsoft.Bcl.AsyncInterfaces.dll" Guid="{6B6A3A64-24DE-4497-B45D-2AD7D997DEB3}">
+                <File Id="Microsoft.Bcl.AsyncInterfaces.dll"  Name="Microsoft.Bcl.AsyncInterfaces.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.DotNet.PlatformAbstractions.dll" Guid="{79BEF1C8-B169-4E16-B326-D52DA57A0667}">
+                <File Id="Microsoft.DotNet.PlatformAbstractions.dll"  Name="Microsoft.DotNet.PlatformAbstractions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.DotNet.PlatformAbstractions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Configuration.Abstractions.dll" Guid="{13E1A305-03CD-4C8C-841E-22990D632A67}">
+                <File Id="Microsoft.Extensions.Configuration.Abstractions.dll"  Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Configuration.Binder.dll" Guid="{90D22ECC-B167-492A-B2FE-DCDAF83433BF}">
+                <File Id="Microsoft.Extensions.Configuration.Binder.dll"  Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Configuration.Binder.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Configuration.dll" Guid="{A6B89582-AAF8-4C60-AE9F-7A1CD1DE4EDF}">
+                <File Id="Microsoft.Extensions.Configuration.dll"  Name="Microsoft.Extensions.Configuration.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Configuration.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Configuration.FileExtensions.dll" Guid="{5759F2B0-245C-4ED2-9054-F3D9DE3A9E0C}">
+                <File Id="Microsoft.Extensions.Configuration.FileExtensions.dll"  Name="Microsoft.Extensions.Configuration.FileExtensions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Configuration.FileExtensions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Configuration.Json.dll" Guid="{978A31FE-8180-43EA-A987-43451DDDA8ED}">
+                <File Id="Microsoft.Extensions.Configuration.Json.dll"  Name="Microsoft.Extensions.Configuration.Json.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Configuration.Json.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Guid="{9325B219-FA25-4721-A4E7-0F09CCA2C150}">
+                <File Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll"  Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.DependencyModel.dll" Guid="{50C4BFA3-9D20-4A21-8D20-5C41CC016C39}">
+                <File Id="Microsoft.Extensions.DependencyModel.dll"  Name="Microsoft.Extensions.DependencyModel.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.DependencyModel.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.FileProviders.Abstractions.dll" Guid="{EE14097C-2804-4AFE-A1E0-7EC3D84D1BCE}">
+                <File Id="Microsoft.Extensions.FileProviders.Abstractions.dll"  Name="Microsoft.Extensions.FileProviders.Abstractions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.FileProviders.Abstractions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.FileProviders.Physical.dll" Guid="{7ACFAA07-AB2B-4512-8638-18FE34E742EB}">
+                <File Id="Microsoft.Extensions.FileProviders.Physical.dll"  Name="Microsoft.Extensions.FileProviders.Physical.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.FileProviders.Physical.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.FileSystemGlobbing.dll" Guid="{504ECC75-C66C-4885-B370-7B33827F1BA3}">
+                <File Id="Microsoft.Extensions.FileSystemGlobbing.dll"  Name="Microsoft.Extensions.FileSystemGlobbing.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.FileSystemGlobbing.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Guid="{4DC54479-261E-4382-B12A-8536DCD58CF5}">
+                <File Id="Microsoft.Extensions.Options.ConfigurationExtensions.dll"  Name="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Options.ConfigurationExtensions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Options.dll" Guid="{F4C13684-DFF1-45C1-BE5A-D204F16D36AB}">
+                <File Id="Microsoft.Extensions.Options.dll"  Name="Microsoft.Extensions.Options.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Options.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Microsoft.Extensions.Primitives.dll" Guid="{D4426B97-6283-405F-A34A-6A4EADC92B8A}">
+                <File Id="Microsoft.Extensions.Primitives.dll"  Name="Microsoft.Extensions.Primitives.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Microsoft.Extensions.Primitives.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Newtonsoft.Json.dll" Guid="{7788CF77-CEA6-4592-985F-537F12735099}">
+                <File Id="Newtonsoft.Json.dll"  Name="Newtonsoft.Json.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Newtonsoft.Json.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="PowerChangeAlerter.Common.dll" Guid="{3D2CEAEA-8E74-499F-BAF4-3CFDDFA0CEDA}">
+                <File Id="PowerChangeAlerter.Common.dll"  Name="PowerChangeAlerter.Common.dll" Source="$(var.PowerChangeAlerter.TargetDir)\PowerChangeAlerter.Common.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="PowerChangeAlerter.Common.pdb" Guid="{61A0E556-3161-410A-A123-06F224065967}">
+                <File Id="PowerChangeAlerter.Common.pdb"  Name="PowerChangeAlerter.Common.pdb" Source="$(var.PowerChangeAlerter.TargetDir)\PowerChangeAlerter.Common.pdb" KeyPath="yes" />
+            </Component>
+
+            <Component Id="PowerChangeAlerter.exe" Guid="{63E65515-6809-45C2-83E4-0A32496ADD71}">
+                <File Id="PowerChangeAlerter.exe"  Name="PowerChangeAlerter.exe"  Source="$(var.PowerChangeAlerter.TargetDir)\PowerChangeAlerter.exe" KeyPath="yes" Vital="yes" />
+                <ServiceInstall Id="ServiceInstaller" Type="ownProcess" Vital="yes" Name="$(var.ServiceRegistrationName)" DisplayName="$(var.ProductName)" Description="Alerting system for sending notifications on power loss" Start="auto" Account="LocalSystem" ErrorControl="ignore" Interactive="no" />
+                <ServiceControl Id="StartService" Stop="both" Remove="uninstall" Name="$(var.ServiceRegistrationName)" Wait="yes" />
+            </Component>
+
+            <Component Id="PowerChangeAlerter.exe.config" Guid="{2EFB5E87-38CF-4EC5-A262-565609940D72}">
+                <File Id="PowerChangeAlerter.exe.config"  Name="PowerChangeAlerter.exe.config" Source="$(var.PowerChangeAlerter.TargetDir)\PowerChangeAlerter.exe.config" KeyPath="yes" />
+            </Component>
+
+            <Component Id="PowerChangeAlerter.pdb" Guid="{BF152F0B-4F66-4E11-8E13-FB74400B2D97}">
+                <File Id="PowerChangeAlerter.pdb"  Name="PowerChangeAlerter.pdb" Source="$(var.PowerChangeAlerter.TargetDir)\PowerChangeAlerter.pdb" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.dll" Guid="{A3891C5D-5B74-4362-9FFD-BD81C2FEDE10}">
+                <File Id="Serilog.dll"  Name="Serilog.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.Enrichers.Thread.dll" Guid="{2FE20FD7-A211-4E46-A39D-B36D7B4FD71E}">
+                <File Id="Serilog.Enrichers.Thread.dll"  Name="Serilog.Enrichers.Thread.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Enrichers.Thread.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.Settings.Configuration.dll" Guid="{13AACE6A-7507-4B2B-98F5-58EE53FC3881}">
+                <File Id="Serilog.Settings.Configuration.dll"  Name="Serilog.Settings.Configuration.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Settings.Configuration.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.Sinks.Console.dll" Guid="{81EC7431-C1C3-4346-95E3-E8E20214C719}">
+                <File Id="Serilog.Sinks.Console.dll"  Name="Serilog.Sinks.Console.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Sinks.Console.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.Sinks.File.dll" Guid="{01EB46D2-F149-4DE4-9AC6-2A5514A81D0E}">
+                <File Id="Serilog.Sinks.File.dll"  Name="Serilog.Sinks.File.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Sinks.File.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Serilog.Sinks.File.pdb" Guid="{1E77E33F-A06B-4178-83EE-4CCD7C5D4741}">
+                <File Id="Serilog.Sinks.File.pdb"  Name="Serilog.Sinks.File.pdb" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Sinks.File.pdb" KeyPath="yes" />
+            </Component>
+
+            <Component Id="settings.runtime" Guid="{ACE2BE2C-D1CF-47A7-94FD-2FFDE5FDE478}">
+                <File Id="settings.runtime"  Name="settings.runtime" Source="$(var.PowerChangeAlerter.TargetDir)\settings.runtime" KeyPath="yes" />
+            </Component>
+
+            <Component Id="settings.serilog" Guid="{64A42D8D-AC81-437E-B7FC-1D5E9FC7DF58}">
+                <File Id="settings.serilog"  Name="settings.serilog" Source="$(var.PowerChangeAlerter.TargetDir)\settings.serilog" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Buffers.dll" Guid="{516B7BF1-557F-4C24-BCC4-7C439FA7641B}">
+                <File Id="System.Buffers.dll"  Name="System.Buffers.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Buffers.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.ComponentModel.Annotations.dll" Guid="{95AC1A35-1401-4D84-A63A-D2B5C27C9546}">
+                <File Id="System.ComponentModel.Annotations.dll"  Name="System.ComponentModel.Annotations.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.ComponentModel.Annotations.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Memory.dll" Guid="{5B9C67C0-E0C3-4B7B-8077-157ABDC141CF}">
+                <File Id="System.Memory.dll"  Name="System.Memory.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Memory.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Numerics.Vectors.dll" Guid="{4C5C2142-4D94-4868-8D06-80BAC507D9AC}">
+                <File Id="System.Numerics.Vectors.dll"  Name="System.Numerics.Vectors.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Numerics.Vectors.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Runtime.CompilerServices.Unsafe.dll" Guid="{027CF79E-1614-496E-8082-56C7675822C0}">
+                <File Id="System.Runtime.CompilerServices.Unsafe.dll"  Name="System.Runtime.CompilerServices.Unsafe.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Text.Encodings.Web.dll" Guid="{49982F12-819C-4BE4-8F59-A4F5A07703C7}">
+                <File Id="System.Text.Encodings.Web.dll"  Name="System.Text.Encodings.Web.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Text.Encodings.Web.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Text.Json.dll" Guid="{A151693A-71DC-4BFE-98AA-F74AAE30DB4C}">
+                <File Id="System.Text.Json.dll"  Name="System.Text.Json.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Text.Json.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.Threading.Tasks.Extensions.dll" Guid="{A800BA66-EBED-4AE4-8658-AA0B38AC3107}">
+                <File Id="System.Threading.Tasks.Extensions.dll"  Name="System.Threading.Tasks.Extensions.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="System.ValueTuple.dll" Guid="{E371632C-81DF-46EA-9852-8066EF5FA16C}">
+                <File Id="System.ValueTuple.dll"  Name="System.ValueTuple.dll" Source="$(var.PowerChangeAlerter.TargetDir)\System.ValueTuple.dll" KeyPath="yes" />
+            </Component>
+
+            <Component Id="Trinet.Core.IO.Ntfs.dll" Guid="{E4F59324-1FA5-4A21-8F2E-69599016940E}">
+                <File Id="Trinet.Core.IO.Ntfs.dll"  Name="Trinet.Core.IO.Ntfs.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Trinet.Core.IO.Ntfs.dll" KeyPath="yes" />
+            </Component>
+
+
+        </DirectoryRef>
+
+        <Feature Id="MainApplication" Title="PowerChangeAlerter" Level="1">
+
+            <!-- .\ -->
+            <ComponentRef Id="Microsoft.Bcl.AsyncInterfaces.dll" />
+            <ComponentRef Id="Microsoft.DotNet.PlatformAbstractions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Configuration.Abstractions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Configuration.Binder.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Configuration.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Configuration.FileExtensions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Configuration.Json.dll" />
+            <ComponentRef Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.DependencyModel.dll" />
+            <ComponentRef Id="Microsoft.Extensions.FileProviders.Abstractions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.FileProviders.Physical.dll" />
+            <ComponentRef Id="Microsoft.Extensions.FileSystemGlobbing.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Options.dll" />
+            <ComponentRef Id="Microsoft.Extensions.Primitives.dll" />
+            <ComponentRef Id="Newtonsoft.Json.dll" />
+            <ComponentRef Id="PowerChangeAlerter.Common.dll" />
+            <ComponentRef Id="PowerChangeAlerter.Common.pdb" />
+            <ComponentRef Id="PowerChangeAlerter.exe" />
+            <ComponentRef Id="PowerChangeAlerter.exe.config" />
+            <ComponentRef Id="PowerChangeAlerter.pdb" />
+            <ComponentRef Id="Serilog.dll" />
+            <ComponentRef Id="Serilog.Enrichers.Thread.dll" />
+            <ComponentRef Id="Serilog.Settings.Configuration.dll" />
+            <ComponentRef Id="Serilog.Sinks.Console.dll" />
+            <ComponentRef Id="Serilog.Sinks.File.dll" />
+            <ComponentRef Id="Serilog.Sinks.File.pdb" />
+            <ComponentRef Id="settings.runtime" />
+            <ComponentRef Id="settings.serilog" />
+            <ComponentRef Id="System.Buffers.dll" />
+            <ComponentRef Id="System.ComponentModel.Annotations.dll" />
+            <ComponentRef Id="System.Memory.dll" />
+            <ComponentRef Id="System.Numerics.Vectors.dll" />
+            <ComponentRef Id="System.Runtime.CompilerServices.Unsafe.dll" />
+            <ComponentRef Id="System.Text.Encodings.Web.dll" />
+            <ComponentRef Id="System.Text.Json.dll" />
+            <ComponentRef Id="System.Threading.Tasks.Extensions.dll" />
+            <ComponentRef Id="System.ValueTuple.dll" />
+            <ComponentRef Id="Trinet.Core.IO.Ntfs.dll" />
+
+            <!-- Remove Directory -->
+            <ComponentRef Id="CleanupMainApplicationFolder" />
+
+        </Feature>
+
+        <UI>
+            <UIRef Id="WixUI_Minimal" />
+        </UI>
+
+    </Product>
+
+</Wix>

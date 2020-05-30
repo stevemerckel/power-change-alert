@@ -9,24 +9,46 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerChangeAlerter.Common",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerChangeAlerter.Sandbox", "PowerChangeAlerter.Sandbox\PowerChangeAlerter.Sandbox.csproj", "{97F39495-CD99-48CF-87ED-EBCB2EBD7459}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "PowerChangeAlerter.Install", "PowerChangeAlerter.Install\PowerChangeAlerter.Install.wixproj", "{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Debug|x86.Build.0 = Debug|Any CPU
 		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|x86.ActiveCfg = Release|Any CPU
+		{2125C2F1-0340-4FBE-B4E5-9AA5B5D9CA22}.Release|x86.Build.0 = Release|Any CPU
 		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Debug|x86.Build.0 = Debug|Any CPU
 		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|x86.ActiveCfg = Release|Any CPU
+		{BE3403D6-2765-48C1-BFE7-E890B27C03C2}.Release|x86.Build.0 = Release|Any CPU
 		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Debug|x86.Build.0 = Debug|Any CPU
 		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|x86.ActiveCfg = Release|Any CPU
+		{97F39495-CD99-48CF-87ED-EBCB2EBD7459}.Release|x86.Build.0 = Release|Any CPU
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Debug|x86.ActiveCfg = Debug|x86
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Debug|x86.Build.0 = Debug|x86
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|Any CPU.ActiveCfg = Release|x86
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|x86.ActiveCfg = Release|x86
+		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
