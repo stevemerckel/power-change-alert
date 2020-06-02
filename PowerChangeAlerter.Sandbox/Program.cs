@@ -9,7 +9,8 @@ namespace PowerChangerAlerter.Sandbox
         {
             // serilog
             IRuntimeSettings rs = RuntimeSettingsProvider.Instance.GetRuntimeSettings();
-            IAppLogger logger = new SerilogAppLogger(rs);
+            IFileManager fm = new LocalFileManager();
+            IAppLogger logger = new SerilogAppLogger(rs, fm);
             logger.Info("meh");
 
             Console.WriteLine();

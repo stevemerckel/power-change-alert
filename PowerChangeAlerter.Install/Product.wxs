@@ -175,6 +175,10 @@
                 <File Id="Serilog.Sinks.File.pdb"  Name="Serilog.Sinks.File.pdb" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Sinks.File.pdb" KeyPath="yes" />
             </Component>
 
+            <Component Id="Serilog.Sinks.Map.dll" Guid="{8B1AD78E-CE2B-4104-B131-E448C5A73A70}">
+                <File Id="Serilog.Sinks.Map.dll"  Name="Serilog.Sinks.Map.dll" Source="$(var.PowerChangeAlerter.TargetDir)\Serilog.Sinks.Map.dll" KeyPath="yes" />
+            </Component>
+
             <Component Id="settings.runtime" Guid="{ACE2BE2C-D1CF-47A7-94FD-2FFDE5FDE478}">
                 <File Id="settings.runtime"  Name="settings.runtime" Source="$(var.PowerChangeAlerter.TargetDir)\settings.runtime" KeyPath="yes" />
             </Component>
@@ -256,6 +260,7 @@
             <ComponentRef Id="Serilog.Sinks.Console.dll" />
             <ComponentRef Id="Serilog.Sinks.File.dll" />
             <ComponentRef Id="Serilog.Sinks.File.pdb" />
+            <ComponentRef Id="Serilog.Sinks.Map.dll" />
             <ComponentRef Id="settings.runtime" />
             <ComponentRef Id="settings.serilog" />
             <ComponentRef Id="System.Buffers.dll" />

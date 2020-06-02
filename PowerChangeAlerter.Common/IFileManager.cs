@@ -9,6 +9,13 @@ namespace PowerChangeAlerter.Common
     public interface IFileManager
     {
         /// <summary>
+        /// Combines elements of a path together using rules based on the operating system
+        /// </summary>
+        /// <param name="paths">List of path elements to cobmine, in the order needed to be combined</param>
+        /// <returns>The combined path</returns>
+        string PathCombine(params string[] paths);
+
+        /// <summary>
         /// Reads contents of text file
         /// </summary>
         /// <param name="fileLocation">File location to open + read</param>
@@ -69,5 +76,12 @@ namespace PowerChangeAlerter.Common
         /// <param name="fileNamePattern">Pattern for file name to search (think of CMD search options)</param>
         /// <returns>Matches found (if any)</returns>
         List<string> GetFilesByPattern(string rootDirectory, string fileNamePattern);
+
+        /// <summary>
+        /// Returns the full directory path leading up to the file
+        /// </summary>
+        /// <param name="fileLocation">File location to pull the directory path from</param>
+        /// <returns>directory path</returns>
+        string PathGetDirectoryName(string fileLocation);
     }
 }

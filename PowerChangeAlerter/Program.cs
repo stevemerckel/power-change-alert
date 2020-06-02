@@ -14,8 +14,8 @@ namespace PowerChangeAlerter
         static void Main(string[] args)
         {
             IRuntimeSettings rs = RuntimeSettingsProvider.Instance.GetRuntimeSettings();
-            IAppLogger logger = new SerilogAppLogger(rs);
             IFileManager fm = new LocalFileManager();
+            IAppLogger logger = new SerilogAppLogger(rs, fm);
             var targetService = new AlerterService(rs, logger, fm);
             const string CommandlineSwitchArg = "CLI";
 

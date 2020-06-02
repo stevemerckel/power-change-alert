@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -20,19 +22,30 @@ namespace PowerChangeAlerter.Common
         /// Default ctor
         /// </summary>
         /// <param name="runtimeSettings">Runtime settings object</param>
-        public SerilogAppLogger(IRuntimeSettings runtimeSettings)
+        public SerilogAppLogger(IRuntimeSettings runtimeSettings, IFileManager fileManager)
         {
             if (runtimeSettings == null)
                 throw new ArgumentNullException("Runtime settings was null!!");
 
+            var serilogConfigFileLocation = fileManager.CombinePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.serilog");
+            var isConfigFound = fileManager.FileExists(serilogConfigFileLocation);
+            Debug.WriteLine($"Looking for Serilog config here: {serilogConfigFileLocation}");
+            Debug.WriteLine($"Serilog config was {(isConfigFound ? string.Empty : "**NOT** ")}found");
+            var ApplicationName = "_meh";
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("settings.serilog")
+                .AddJsonFile(serilogConfigFileLocation)
                 .Build();
 
             _serilog = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
+                //.MinimumLevel.Debug()
+                //.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
+                //.Enrich.FromLogContext()
                 .Enrich.WithProperty("George", "WhoWhatTimmay")
+                .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"./logs/log-fromcode-{name}.txt"))
                 .CreateLogger();
+
+            Info($"{nameof(SerilogAppLogger)} exiting.");
         }
 
         /// <inheritdoc />

@@ -81,5 +81,17 @@ namespace PowerChangeAlerter.Common
         {
             return Directory.EnumerateFiles(rootDirectory, fileNamePattern, SearchOption.AllDirectories).ToList();
         }
+
+        /// <inheritdoc />
+        public string PathCombine(params string[] paths)
+        {
+            return Path.Combine(paths);
+        }
+
+        /// <inheritdoc />
+        public string PathGetDirectoryName(string fileLocation)
+        {
+            return Path.GetDirectoryName(fileLocation);
+        }
     }
 }
