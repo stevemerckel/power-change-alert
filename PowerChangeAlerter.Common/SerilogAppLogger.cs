@@ -36,7 +36,7 @@ namespace PowerChangeAlerter.Common
 
             // decide output log file
             // - for within visual studio, write to "logs" folder in runtime directory
-            // - for executing as process or windows service, write to %ProgramData%\{Settings
+            // - for executing as process or windows service, write to vendor/app folder in CommonApplicationData directory
             var logDirectory = Utility.IsDebugging
                 ? "./logs"
                 : fileManager.PathCombine(fileManager.EnvironmentGetFolderPath(Environment.SpecialFolder.CommonApplicationData), StaticVariables.VendorName, "logs");
@@ -49,9 +49,6 @@ namespace PowerChangeAlerter.Common
 
             _serilog = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
-                //.MinimumLevel.Debug()
-                //.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
-                //.Enrich.FromLogContext()
                 .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
                 .CreateLogger();
 
