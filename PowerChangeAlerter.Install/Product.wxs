@@ -14,14 +14,12 @@
              Manufacturer="$(var.CreatedBy)"
              UpgradeCode="{CD7142EF-6494-43C8-B1CB-C601136D42B1}">
 
-        <Package InstallerVersion="200" Compressed="yes" />
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
         <!-- Prevents installation on 32-bit machines -->
         <Condition Message="This application is supported only on 64-bit Windows installations.">
             <![CDATA[Installed OR (VersionNT64 >= 601)]]>
         </Condition>
-
-        <Property Id="ALLUSERS" Value="1" />
 
         <!-- always going to remove previous and install new for upgrades -->
         <Upgrade Id="{8A654398-41B2-4EA4-A932-ED8F49E107CB}">
