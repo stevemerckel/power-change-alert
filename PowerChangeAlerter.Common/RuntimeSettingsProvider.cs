@@ -27,7 +27,7 @@ namespace PowerChangeAlerter.Common
         {
             // validate presence of settings file
             var executingDirectory = _fm.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var runtimeSettingsFileLocation = _fm.CombinePath(executingDirectory, RuntimeSettingsFileName);
+            var runtimeSettingsFileLocation = _fm.PathCombine(executingDirectory, RuntimeSettingsFileName);
 
             // check runtime directory first for settings file
             var isSettingsFileFound = _fm.FileExists(runtimeSettingsFileLocation);

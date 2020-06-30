@@ -40,12 +40,6 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
-        public string CombinePath(string first, string second)
-        {
-            return Path.Combine(first, second);
-        }
-
-        /// <inheritdoc />
         public string GetDirectoryName(string path)
         {
             return Path.GetDirectoryName(path);
@@ -92,6 +86,12 @@ namespace PowerChangeAlerter.Common
         public string PathGetDirectoryName(string fileLocation)
         {
             return Path.GetDirectoryName(fileLocation);
+        }
+
+        /// <inheritdoc />
+        public string EnvironmentGetFolderPath(Environment.SpecialFolder specialFolder)
+        {
+            return Environment.GetFolderPath(specialFolder);
         }
     }
 }

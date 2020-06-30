@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -27,22 +26,33 @@ namespace PowerChangeAlerter.Common
             if (runtimeSettings == null)
                 throw new ArgumentNullException("Runtime settings was null!!");
 
-            var serilogConfigFileLocation = fileManager.CombinePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.serilog");
+            var serilogConfigFileLocation = fileManager.PathCombine(fileManager.PathGetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.serilog");
             var isConfigFound = fileManager.FileExists(serilogConfigFileLocation);
             Debug.WriteLine($"Looking for Serilog config here: {serilogConfigFileLocation}");
             Debug.WriteLine($"Serilog config was {(isConfigFound ? string.Empty : "**NOT** ")}found");
-            var ApplicationName = "_meh";
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile(serilogConfigFileLocation)
                 .Build();
+
+            // decide output log file
+            // - for within visual studio, write to "logs" folder in runtime directory
+            // - for executing as process or windows service, write to %ProgramData%\{Settings
+            var logDirectory = Utility.IsDebugging
+                ? "./logs"
+                : fileManager.PathCombine(fileManager.EnvironmentGetFolderPath(Environment.SpecialFolder.CommonApplicationData), StaticVariables.VendorName, "logs");
+
+            logDirectory = logDirectory.Replace(@"\\", "/").Replace(@"\", "/");
+            if (logDirectory.EndsWith("/"))
+                logDirectory = logDirectory.TrimEnd('/');
+
+            Debug.WriteLine($"Log directory = {logDirectory}");
 
             _serilog = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 //.MinimumLevel.Debug()
                 //.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
                 //.Enrich.FromLogContext()
-                .Enrich.WithProperty("George", "WhoWhatTimmay")
-                .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"./logs/log-fromcode-{name}.txt"))
+                .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
                 .CreateLogger();
 
             Info($"{nameof(SerilogAppLogger)} exiting.");

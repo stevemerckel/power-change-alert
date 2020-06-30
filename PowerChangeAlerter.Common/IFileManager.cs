@@ -40,14 +40,6 @@ namespace PowerChangeAlerter.Common
         void UnblockFile(string fileLocation);
 
         /// <summary>
-        /// Combines the two paths together
-        /// </summary>
-        /// <param name="first">The first path</param>
-        /// <param name="second">The second path</param>
-        /// <returns>The combined path</returns>
-        string CombinePath(string first, string second);
-
-        /// <summary>
         /// <para>Returns the parent directory path.</para>
         /// <para>If no info is available, returns <c>string.Empty</c></para>
         /// <para>If path is a root directory, returns <c>null</c></para>
@@ -83,5 +75,10 @@ namespace PowerChangeAlerter.Common
         /// <param name="fileLocation">File location to pull the directory path from</param>
         /// <returns>directory path</returns>
         string PathGetDirectoryName(string fileLocation);
+
+        /// <summary>
+        /// Returns the mapped special folder to the environment
+        /// </summary>
+        string EnvironmentGetFolderPath(Environment.SpecialFolder specialFolder);
     }
 }
