@@ -65,4 +65,9 @@
 	<Target Name="AfterBuild">
 	</Target>
 	-->
+  <PropertyGroup>
+    <PostBuildEvent>:: Invoke the PowerShell script to copy + rename the generated MSI to the repo root.
+:: NOTE: Since we are back-pedaling the output directory path, you MUST make sure the trailing back-slash is a %2a%2adouble%2a%2a back-slash.
+powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File "$(ProjectDir)..\copy-msi-with-rename.ps1" "!(TargetPath)" "$(ProjectDir)..\PowerChangeAlerter\$(OutDir)PowerChangeAlerter.exe" "$(ProjectDir)..\\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
