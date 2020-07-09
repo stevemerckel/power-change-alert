@@ -23,7 +23,7 @@ Write-Host $outputDirectory
 
 # Validate parameters and expected paths
 If (![System.IO.File]::Exists($msiLocation)){
-    Write-Error "MSI file not found! -- " + $msiLocation
+    Write-Error "MSI file not found! -- $msiLocation"
     Exit 2
 }
 If (!$msiLocation.EndsWith("msi")){
@@ -57,7 +57,7 @@ try {
 }
 catch [System.Exception] {
     $ex = $_.Exception
-    Write-Warning "Exception thrown trying to get version, going to use default assignment instead -- details: " + $ex
+    Write-Warning "Exception thrown trying to get version, going to use default assignment instead -- details: $ex"
 }
 
 # Determine destination file location
@@ -67,9 +67,10 @@ $destinationFileLocation = [System.IO.Path]::Combine($destinationDirectory, $new
 Write-Debug "destinationFileLocation = $destinationFileLocation"
 
 # Remove all MSI files from output directory
-$deleteList = [System.IO.Directory]::GetFiles($destinationDirectory, "*.msi")
+$filterExtension = "msi"
+$deleteList = [System.IO.Directory]::GetFiles($destinationDirectory, "*.$filterExtension")
 if ($deleteList.Count -gt 0) {
-    Write-Warning "Found $($deleteList.Count) file(s) to delete in output location, going to delete them"
+    Write-Host "Found $($deleteList.Count) $filterExtension file(s) to delete in output location, going to delete them"
     $deleteList | ForEach-Object { [System.IO.File]::Delete($_) }
 }
 

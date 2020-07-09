@@ -46,7 +46,7 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
-        public Version GetCurrentAssemblyVersion()
+        public Version GetExecutingAssemblyVersion()
         {
             return GetAssemblyVersion(Assembly.GetExecutingAssembly().Location);
         }

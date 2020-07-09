@@ -51,7 +51,7 @@ namespace PowerChangeAlerter.Common
         /// <summary>
         /// Returns the version of the current assembly
         /// </summary>
-        Version GetCurrentAssemblyVersion();
+        Version GetExecutingAssemblyVersion();
 
         /// <summary>
         /// Returns the version of the target file
