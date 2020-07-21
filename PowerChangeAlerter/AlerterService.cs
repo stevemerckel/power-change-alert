@@ -2,10 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.ServiceProcess;
-using System.Text;
 using PowerChangeAlerter.Common;
-using System.Threading;
-using System.Management;
 
 namespace PowerChangeAlerter
 {
@@ -18,6 +15,12 @@ namespace PowerChangeAlerter
         private DateTime _now;
         private PowerModes _currentPowerMode = PowerModes.Resume;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="runtimeSettings">Runtime settings object</param>
+        /// <param name="logger">Logger object</param>
+        /// <param name="fileManager">File system manager</param>
         public AlerterService(IRuntimeSettings runtimeSettings, IAppLogger logger, IFileManager fileManager)
         {
             InitializeComponent();
@@ -82,6 +85,8 @@ namespace PowerChangeAlerter
 
         public void StartService()
         {
+            _alertManager.ManagerStart();
+
             // bind to system events
             SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(HandlePowerModeChanged);
             SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
@@ -97,7 +102,7 @@ namespace PowerChangeAlerter
             SystemEvents.UserPreferenceChanged -= HandleUserPreferenceChanged;
             SystemEvents.TimeChanged -= HandleTimeChanged;
 
-            // todo: anything left to do?
+            _alertManager.ManagerStop();
         }
 
         public void PauseService()
@@ -144,7 +149,7 @@ namespace PowerChangeAlerter
         {
             _logger.Warn($"Entered {nameof(OnPause)}");
             base.OnPause();
-            _alertManager.ManagerPause();
+            _alertManager.ManagerStop();
             _logger.Warn($"Exiting {nameof(OnPause)}");
         }
 
@@ -152,7 +157,7 @@ namespace PowerChangeAlerter
         {
             _logger.Warn($"Entered {nameof(OnContinue)}");
             base.OnContinue();
-            _alertManager.ManagerContinue();
+            _alertManager.ManagerStart();
             _logger.Warn($"Exiting {nameof(OnContinue)}");
         }
 

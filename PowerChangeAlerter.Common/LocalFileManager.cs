@@ -57,15 +57,12 @@ namespace PowerChangeAlerter.Common
             if (!File.Exists(fileLocation))
                 return null;
 
-            Version version;
+            Version version = null;
             try
             {
                 version = Version.Parse(FileVersionInfo.GetVersionInfo(fileLocation).FileVersion);
             }
-            catch
-            {
-                version = null;
-            }
+            catch { } // intentionally eat
 
             return version;
         }

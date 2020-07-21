@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SerilogVariableEnricher.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="settings.runtime" />
     <None Remove="settings.serilog" />
   </ItemGroup>

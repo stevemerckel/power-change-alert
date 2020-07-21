@@ -20,12 +20,6 @@ namespace PowerChangeAlerter
             IAppLogger logger = new SerilogAppLogger(rs, fm);
             var targetService = new AlerterService(rs, logger, fm);
 
-            // write initialization info
-            var startupMessage = rs.IsLocalDebugging
-                ? "Running with debugging within Visual Studio"
-                : "Running as commandline application manually";
-            logger.Info($"  ***  {startupMessage}  ***  ");
-
             if (!rs.IsLocalDebugging && args.Length == 0)
             {
                 // run as windows service
@@ -53,16 +47,23 @@ namespace PowerChangeAlerter
                 ? Regex.Replace(args[0].Trim().ToUpper(), "[^a-zA-Z]", string.Empty)
                 : null;
 
+            if (rs.IsLocalDebugging && receivedArg == null)
+            {
+                // assume this is running from visual studio and run as CLI
+                RunCommandline(targetService, logger);
+                return;
+            }
+
             // decide behavior from arg value
             switch (receivedArg)
             {
-                case CommandlineSwitchArg:
                 case null:
-                    RunCommandline(targetService, logger);
-                    break;
                 case HelpShortSwitch:
                 case HelpLongSwitch:
                     logger.Info($"You can run from commandline with '{CommandlineSwitchArg}' param, or register and run this as a Windows Service.");
+                    break;
+                case CommandlineSwitchArg:
+                    RunCommandline(targetService, logger);
                     break;
                 default:
                     logger.Error($"Did not recognize argument '{receivedArg}'.  Use switch '{HelpLongSwitch}' for more info.");

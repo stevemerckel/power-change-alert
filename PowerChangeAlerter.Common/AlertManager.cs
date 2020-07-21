@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Management;
 using System.ServiceProcess;
@@ -8,6 +7,7 @@ using System.Threading;
 
 namespace PowerChangeAlerter.Common
 {
+    /// <inheritdoc />
     public sealed class AlertManager : IAlertManager
     {
         private readonly IAppLogger _logger;
@@ -22,6 +22,12 @@ namespace PowerChangeAlerter.Common
         private bool _isFirstUptimeLogged = false;
         private bool _isBatteryDetected;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="runtimeSettings">Runtime settings object</param>
+        /// <param name="logger">Application logger object</param>
+        /// <param name="fileManager">File system object</param>
         public AlertManager(IRuntimeSettings runtimeSettings, IAppLogger logger, IFileManager fileManager)
         {
             _rs = runtimeSettings;
@@ -43,6 +49,10 @@ namespace PowerChangeAlerter.Common
                 _logger.Warn("No battery was found, so changes in power state will not be reported");
         }
 
+        /// <summary>
+        /// Writes uptime messages to logger
+        /// </summary>
+        /// <param name="state"></param>
         private void LogUptime(object state)
         {
             if (!_isFirstUptimeLogged)
@@ -58,6 +68,9 @@ namespace PowerChangeAlerter.Common
             DumpPowerInfo();
         }
 
+        /// <summary>
+        /// Whether a battery is found on the host device
+        /// </summary>
         private bool IsBatteryAvailable()
         {
             ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_Battery");
@@ -66,6 +79,9 @@ namespace PowerChangeAlerter.Common
             return collection.Count > 0;
         }
 
+        /// <summary>
+        /// Writes a bunch of (possibly) useful power state information
+        /// </summary>
         private void DumpPowerInfo()
         {
             PowerBroadcastStatus pbs = new PowerBroadcastStatus();
@@ -86,11 +102,7 @@ namespace PowerChangeAlerter.Common
             }
         }
 
-        public void ManagerPause()
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc />
         public void ManagerStart()
         {
             // write runtime startup metrics
@@ -109,16 +121,19 @@ namespace PowerChangeAlerter.Common
             // todo: finish implementation
         }
 
+        /// <inheritdoc />
         public void ManagerStop()
         {
-            throw new NotImplementedException();
+            _logger.Info($"{nameof(ManagerStop)} was hit");
         }
 
+        /// <inheritdoc />
         public void NotifyHostShutdown()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public void NotifyPowerFromWall()
         {
             if (!_isBatteryDetected)
@@ -128,6 +143,7 @@ namespace PowerChangeAlerter.Common
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public void NotifyPowerOnBattery()
         {
             if (!_isBatteryDetected)
@@ -137,12 +153,8 @@ namespace PowerChangeAlerter.Common
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public void NotifyTimeChange(DateTime previous, DateTime adjusted)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ManagerContinue()
         {
             throw new NotImplementedException();
         }
