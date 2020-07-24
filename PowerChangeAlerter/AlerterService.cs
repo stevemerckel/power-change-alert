@@ -76,6 +76,7 @@ namespace PowerChangeAlerter
                     // status changed from AC to battery or vice-versa
                     var pbs = new PowerBroadcastStatus();
                     _logger.Info($"{nameof(HandlePowerModeChanged)} received {e.Mode} -- current {nameof(PowerBroadcastStatus)} is {pbs}");
+                    // todo: send notification to alert manager with the proper power notification call
                     break;
                 case PowerModes.Suspend:
                     // going into suspended power mode
