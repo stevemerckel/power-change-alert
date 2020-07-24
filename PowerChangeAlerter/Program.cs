@@ -18,7 +18,21 @@ namespace PowerChangeAlerter
             IRuntimeSettings rs = RuntimeSettingsProvider.Instance.GetRuntimeSettings();
             IFileManager fm = new LocalFileManager();
             IAppLogger logger = new SerilogAppLogger(rs, fm);
-            var targetService = new AlerterService(rs, logger, fm);
+            AlerterService targetService;
+            try
+            {
+                 targetService = new AlerterService(rs, logger, fm);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = ex.ToString();
+                if (ex.InnerException != null)
+                    errorMessage += $" --- Inner Exception = {ex.InnerException}";
+
+                Console.WriteLine($"Unhandled exception when intializing {nameof(targetService)} -- Details: {errorMessage}");
+                Environment.ExitCode = 999;
+                return;
+            }
 
             if (!rs.IsLocalDebugging && args.Length == 0)
             {

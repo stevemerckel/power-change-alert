@@ -5,16 +5,16 @@
         "WriteTo": [
             {
                 "Name": "Console"
-            },
-            {
-                "Name": "File",
-                "Args": {
-                    "path": "_UnidentifiedFileName_log_.txt",
-                    "rollingInterval": "Day",
-                    "outputTemplate": "{Timestamp:HH:mm:ss} {Level:u3} [{ThreadId}]:  {Message:lj}{NewLine}{Exception}",
-                    "shared": true
-                }
-            }
+            }//,
+            //{
+            //    "Name": "File",
+            //    "Args": {
+            //        "path": "_UnidentifiedFileName_log_.txt",
+            //        "rollingInterval": "Day",
+            //        "outputTemplate": "{Timestamp:HH:mm:ss} {Level:u3} [{ThreadId}]:  {Message:lj}{NewLine}{Exception}",
+            //        "shared": true
+            //    }
+            //}
         ],
         "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
         "Properties": {

@@ -31,24 +31,26 @@ namespace PowerChangeAlerter
         private void HandleTimeChanged(object sender, EventArgs e)
         {
             _stopWatch.Stop();
-            DateTime shouldBe;
+            DateTime previousSystemDateTime;
             lock (_lock)
             {
-                shouldBe = _now.Add(_stopWatch.Elapsed);
+                previousSystemDateTime = _now.Add(_stopWatch.Elapsed);
                 _now = DateTime.Now;
                 _stopWatch.Reset();
                 _stopWatch.Start();
             }
 
-            const int ThresholdInSeconds = 5;
-            int deltaSeconds = Math.Abs((int)shouldBe.Subtract(DateTime.Now).TotalSeconds);
+            const int ThresholdInSeconds = 30;
+            int deltaSeconds = Math.Abs((int)previousSystemDateTime.Subtract(DateTime.Now).TotalSeconds);
             if (deltaSeconds < ThresholdInSeconds)
             {
-                Debug.WriteLine($"An insignificant time change was detected (less than {ThresholdInSeconds} seconds)");
+                Debug.WriteLine($"An insignificant time change of {deltaSeconds} seconds was detected -- ignored because under {ThresholdInSeconds} second threshold");
                 return;
             }
 
-            var msg = $"{nameof(HandleTimeChanged)} from {shouldBe} to {DateTime.Now:MM/dd/yyyy hh:mm:ss tt}";
+            var newSystemDateTime = DateTime.Now;
+            var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
+            _alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
             _logger.Warn(msg);
         }
 
@@ -92,6 +94,8 @@ namespace PowerChangeAlerter
             SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
             SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
             SystemEvents.TimeChanged += HandleTimeChanged;
+
+            _now = DateTime.Now;
         }
 
         public void StopService()

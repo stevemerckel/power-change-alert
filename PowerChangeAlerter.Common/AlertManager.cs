@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Management;
 using System.ServiceProcess;
 using System.Text;
@@ -13,12 +12,10 @@ namespace PowerChangeAlerter.Common
         private readonly IAppLogger _logger;
         private readonly IRuntimeSettings _rs;
         private readonly IFileManager _fm;
-        private readonly Stopwatch _stopWatch = new Stopwatch();
-        private DateTime _now;
         private int _uptimeMinutesCount = 0;
-        private readonly int _uptimeDelayInMinutes;
+        private int _uptimeDelayInMinutes;
         private readonly object _lock = new object();
-        private readonly Timer _uptimeTimer;
+        private Timer _uptimeTimer;
         private bool _isFirstUptimeLogged = false;
         private bool _isBatteryDetected;
 
@@ -33,20 +30,6 @@ namespace PowerChangeAlerter.Common
             _rs = runtimeSettings;
             _logger = logger;
             _fm = fileManager;
-            _now = DateTime.Now;
-            _stopWatch.Start();
-
-            // initialize uptime tracker
-            _uptimeDelayInMinutes = runtimeSettings.IsLocalDebugging ? 1 : 20;
-            _uptimeTimer = new Timer(LogUptime);
-            _uptimeTimer.Change(0, (int)TimeSpan.FromMinutes(_uptimeDelayInMinutes).TotalMilliseconds);
-
-            // report battery presence
-            _isBatteryDetected = IsBatteryAvailable();
-            if (_isBatteryDetected)
-                _logger.Info("Battery was found");
-            else
-                _logger.Warn("No battery was found, so changes in power state will not be reported");
         }
 
         /// <summary>
@@ -118,7 +101,17 @@ namespace PowerChangeAlerter.Common
             sb.AppendLine($"\t- {nameof(_rs.EmailRecipientAddress)} = {_rs.EmailRecipientAddress}");
             _logger.Info(sb.ToString());
 
-            // todo: finish implementation
+            // initialize uptime tracker
+            _uptimeDelayInMinutes = _rs.IsLocalDebugging ? 1 : 20;
+            _uptimeTimer = new Timer(LogUptime);
+            _uptimeTimer.Change(0, (int)TimeSpan.FromMinutes(_uptimeDelayInMinutes).TotalMilliseconds);
+
+            // report battery presence
+            _isBatteryDetected = IsBatteryAvailable();
+            if (_isBatteryDetected)
+                _logger.Info("Battery was found");
+            else
+                _logger.Warn("No battery was found, so changes in power state will not be reported");
         }
 
         /// <inheritdoc />
