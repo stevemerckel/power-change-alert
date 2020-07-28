@@ -18,6 +18,7 @@ namespace PowerChangeAlerter.Common
         private Timer _uptimeTimer;
         private bool _isFirstUptimeLogged = false;
         private bool _isBatteryDetected;
+        private readonly ISmtpHelper _smtpHelper;
 
         /// <summary>
         /// ctor
@@ -30,6 +31,7 @@ namespace PowerChangeAlerter.Common
             _rs = runtimeSettings;
             _logger = logger;
             _fm = fileManager;
+            _smtpHelper = new SmtpHelper(_rs, _logger);
         }
 
         /// <summary>
@@ -88,6 +90,8 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void ManagerStart()
         {
+            _logger.Info($"{nameof(ManagerStart)} was hit");
+
             // write runtime startup metrics
             var currentVersion = _fm.GetExecutingAssemblyVersion();
             var sb = new StringBuilder();
@@ -123,33 +127,48 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void NotifyHostShutdown()
         {
-            throw new NotImplementedException();
+            _logger.Warn("System is shutting down");
         }
 
         /// <inheritdoc />
         public void NotifyPowerFromWall()
         {
             if (!_isBatteryDetected)
+            {
                 _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
+                return;
+            }
 
-
-            throw new NotImplementedException();
+            var message = "Changed to battery power";
+            _logger.Info(message);
+            _smtpHelper.Send("Power Now on Battery", message);
         }
 
         /// <inheritdoc />
         public void NotifyPowerOnBattery()
         {
             if (!_isBatteryDetected)
+            {
                 _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
+                return;
+            }
 
-
-            throw new NotImplementedException();
+            var message = "Changed to wall power";
+            _logger.Info(message);
+            _smtpHelper.Send("Power Now on Wall", message);
         }
 
         /// <inheritdoc />
         public void NotifyTimeChange(DateTime previous, DateTime adjusted)
         {
-            throw new NotImplementedException();
+            var isForward = adjusted >= previous;
+            var isDateChanged = previous.Date != adjusted.Date;
+            var previousString = isDateChanged ? previous.ToString() : previous.ToLongTimeString();
+            var adjustedString = isDateChanged ? adjusted.ToString() : adjusted.ToLongTimeString();
+
+            var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
+            _logger.Info(message);
+            _smtpHelper.Send("Time Change", message);
         }
     }
 }
