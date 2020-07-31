@@ -12,7 +12,7 @@
              Language="1033"
              Version="$(var.Version)"
              Manufacturer="$(var.CreatedBy)"
-             UpgradeCode="{CD7142EF-6494-43C8-B1CB-C601136D42B1}">
+             UpgradeCode="{8C7DBB46-DC69-4203-B751-B8E65690D51E}">
 
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
@@ -22,7 +22,7 @@
         </Condition>
 
         <!-- always going to remove previous and install new for upgrades -->
-        <Upgrade Id="{8A654398-41B2-4EA4-A932-ED8F49E107CB}">
+        <Upgrade Id="{8C7DBB46-DC69-4203-B751-B8E65690D51E}">
             <UpgradeVersion Minimum="1.0.0.0"
                             Maximum="99.0.0.0"
                             Property="PREVIOUSVERSIONSINSTALLED"
