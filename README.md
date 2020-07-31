@@ -10,9 +10,17 @@ The intent is to have a notification when power is lost on a known electricl cir
 
 * Visual Studio 2019
 * C# Windows Service
-* Gmail Integration
+* .NET Framework (4.8)
+* .NET Standard (2.0)
+* .NET Core (3.1)
+* Gmail SMTP Communication - a valid Gmail account is needed
+* PowerShell
 
 ## NuGet Packages
 
 * Serilog
 * Newtonsoft JSON
+
+## Environment Setup
+
+[TODO]
