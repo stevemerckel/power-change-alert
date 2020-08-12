@@ -13,6 +13,7 @@ namespace PowerChangeAlerter.Common
     public sealed class RuntimeSettingsProvider : IRuntimeSettingsProvider
     {
         private static readonly string RuntimeSettingsFileName = "settings.runtime";
+        private static readonly string RuntimeSettingsTemplateFileName = "settings.runtime.TEMPLATE";
         private static readonly IFileManager _fm = new LocalFileManager();
         private readonly IRuntimeSettings _settings;
 
@@ -45,14 +46,23 @@ namespace PowerChangeAlerter.Common
             }
 
             if (!isSettingsFileFound)
-                throw new Exception($"Could not find file '{RuntimeSettingsFileName}' at '{executingDirectory}'  (or any sub-directories)");
+                throw new Exception($"Could not find file '{RuntimeSettingsFileName}' at '{executingDirectory}'  (or any sub-directories) -- Ensure that the file '{RuntimeSettingsFileName}' exists in the runtime directory, and is based on the file '{RuntimeSettingsTemplateFileName}'.");
 
             // read JSON content and hydrate properties
             var contents = _fm.ReadAllText(runtimeSettingsFileLocation);
             if (string.IsNullOrWhiteSpace(contents))
                 throw new Exception($"The '{RuntimeSettingsFileName}' file was found but had no content! -- file location = {runtimeSettingsFileLocation}");
 
-            var target = JsonConvert.DeserializeObject<RuntimeSettings>(contents);
+            RuntimeSettings target;
+            try
+            {
+                target = JsonConvert.DeserializeObject<RuntimeSettings>(contents);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"The '{RuntimeSettingsFileName}' file was found but the content could not be deserialized into type '{nameof(RuntimeSettings)}' -- Details: {ex}");
+            }
+
             _settings = target;
         }
 

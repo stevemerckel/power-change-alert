@@ -6,6 +6,9 @@
 # Generated build artifacts placed in root of repo
 /*.msi
 
+# User-modified "runtime.settings" file
+settings.runtime
+
 # User-specific files
 *.rsuser
 *.suo
