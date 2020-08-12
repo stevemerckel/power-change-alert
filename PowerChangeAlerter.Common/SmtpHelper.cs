@@ -26,10 +26,16 @@ namespace PowerChangeAlerter.Common
         public void Send(string subject, string body)
         {
             if (string.IsNullOrWhiteSpace(_runtimeSettings.EmailSenderAddress))
-                throw new ArgumentException($"{nameof(_runtimeSettings.EmailSenderAddress)} requires a value!");
+            {
+                _logger.Error($"Unable to send email because setting '{nameof(_runtimeSettings.EmailSenderAddress)}' is missing! -- subject = {subject} -- body = {body}");
+                return;
+            }
 
             if (string.IsNullOrWhiteSpace(_runtimeSettings.EmailRecipientAddress))
-                throw new ArgumentException($"{nameof(_runtimeSettings.EmailRecipientAddress)} requires a value!");
+            {
+                _logger.Error($"Unable to send email because setting '{nameof(_runtimeSettings.EmailRecipientAddress)}' is missing! -- subject = {subject} -- body = {body}");
+                return;
+            }
 
             SmtpClient client = null;
             MailMessage mm = null;
@@ -68,7 +74,6 @@ namespace PowerChangeAlerter.Common
                 if (smtpEx.InnerException != null)
                     message += $" --- Inner Exception: {smtpEx.InnerException}";
                 _logger?.Error(message);
-                throw;
             }
             catch (Exception ex)
             {
@@ -76,7 +81,6 @@ namespace PowerChangeAlerter.Common
                 if (ex.InnerException != null)
                     message += $" --- Inner Exception: {ex.InnerException}";
                 _logger?.Error(message);
-                throw;
             }
             finally
             {

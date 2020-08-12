@@ -75,6 +75,12 @@ namespace PowerChangeAlerter
             // set up hidden form to be used as message pump
             // Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
             _hiddenFormTask?.Dispose();
+            _hiddenFormTask = new Task(() => RunHiddenForm());
+            _hiddenFormTask.Start();
+        }
+
+        private void RunHiddenForm()
+        {
             _hiddenForm?.Dispose();
             _hiddenForm = new HiddenForm(_alertManager)
             {
@@ -85,8 +91,7 @@ namespace PowerChangeAlerter
                 //StartPosition = FormStartPosition.Manual,
                 Visible = true,
             };
-            _hiddenFormTask = new Task(() => Application.Run(_hiddenForm));
-            _hiddenFormTask.Start();
+            Application.Run(_hiddenForm);
         }
 
         public void StopService()
