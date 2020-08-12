@@ -78,7 +78,12 @@ namespace PowerChangeAlerter
             _hiddenForm?.Dispose();
             _hiddenForm = new HiddenForm(_alertManager)
             {
-                Visible = false
+                //FormBorderStyle = FormBorderStyle.FixedToolWindow,
+                //Location = new System.Drawing.Point(-2000, -2000),
+                //ShowInTaskbar = false,
+                //Size = new System.Drawing.Size(1, 1),
+                //StartPosition = FormStartPosition.Manual,
+                Visible = true,
             };
             _hiddenFormTask = new Task(() => Application.Run(_hiddenForm));
             _hiddenFormTask.Start();
