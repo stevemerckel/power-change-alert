@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Management;
 using System.ServiceProcess;
 using System.Text;
@@ -168,6 +169,7 @@ namespace PowerChangeAlerter.Common
 
             var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
             _logger.Info(message);
+            Debug.WriteLine($"{nameof(NotifyTimeChange)} - {message}");
             _smtpHelper.Send("Time Change", message);
         }
     }

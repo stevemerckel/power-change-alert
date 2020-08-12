@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using PowerChangeAlerter.Common;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PowerChangeAlerter
 {
@@ -12,8 +14,9 @@ namespace PowerChangeAlerter
         private readonly IAlertManager _alertManager;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
-        private DateTime _now;
         private PowerModes _currentPowerMode = PowerModes.Resume;
+        private Task _hiddenFormTask;
+        private HiddenForm _hiddenForm;
 
         /// <summary>
         /// ctor
@@ -26,32 +29,6 @@ namespace PowerChangeAlerter
             InitializeComponent();
             _logger = logger;
             _alertManager = new AlertManager(runtimeSettings, _logger, fileManager);
-        }
-
-        private void HandleTimeChanged(object sender, EventArgs e)
-        {
-            _stopWatch.Stop();
-            DateTime previousSystemDateTime;
-            lock (_lock)
-            {
-                previousSystemDateTime = _now.Add(_stopWatch.Elapsed);
-                _now = DateTime.Now;
-                _stopWatch.Reset();
-                _stopWatch.Start();
-            }
-
-            const int ThresholdInSeconds = 30;
-            int deltaSeconds = Math.Abs((int)previousSystemDateTime.Subtract(DateTime.Now).TotalSeconds);
-            if (deltaSeconds < ThresholdInSeconds)
-            {
-                Debug.WriteLine($"An insignificant time change of {deltaSeconds} seconds was detected -- ignored because under {ThresholdInSeconds} second threshold");
-                return;
-            }
-
-            var newSystemDateTime = DateTime.Now;
-            var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
-            _alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
-            _logger.Warn(msg);
         }
 
         private void HandleUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -94,9 +71,17 @@ namespace PowerChangeAlerter
             SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(HandlePowerModeChanged);
             SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
             SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
-            SystemEvents.TimeChanged += HandleTimeChanged;
 
-            _now = DateTime.Now;
+            // set up hidden form to be used as message pump
+            // Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
+            _hiddenFormTask?.Dispose();
+            _hiddenForm?.Dispose();
+            _hiddenForm = new HiddenForm(_alertManager)
+            {
+                Visible = false
+            };
+            _hiddenFormTask = new Task(() => Application.Run(_hiddenForm));
+            _hiddenFormTask.Start();
         }
 
         public void StopService()
@@ -105,7 +90,6 @@ namespace PowerChangeAlerter
             SystemEvents.PowerModeChanged -= HandlePowerModeChanged;
             SystemEvents.DisplaySettingsChanged -= HandleDisplaySettingsChanged;
             SystemEvents.UserPreferenceChanged -= HandleUserPreferenceChanged;
-            SystemEvents.TimeChanged -= HandleTimeChanged;
 
             _alertManager.ManagerStop();
         }

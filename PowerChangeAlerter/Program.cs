@@ -19,6 +19,7 @@ namespace PowerChangeAlerter
             IFileManager fm = new LocalFileManager();
             IAppLogger logger = new SerilogAppLogger(rs, fm);
             AlerterService targetService;
+
             try
             {
                  targetService = new AlerterService(rs, logger, fm);
