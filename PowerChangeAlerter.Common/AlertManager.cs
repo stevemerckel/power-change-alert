@@ -44,14 +44,13 @@ namespace PowerChangeAlerter.Common
             if (!_isFirstUptimeLogged)
             {
                 _logger.Info($"{nameof(LogUptime)} initialized!");
-                _isFirstUptimeLogged = true;
                 DumpPowerInfo();
+                _isFirstUptimeLogged = true;
                 return;
             }
 
             _uptimeMinutesCount += _uptimeDelayInMinutes;
             _logger.Info($"{nameof(LogUptime)} running for {_uptimeMinutesCount} minutes");
-            DumpPowerInfo();
         }
 
         /// <summary>
