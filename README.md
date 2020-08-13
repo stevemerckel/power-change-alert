@@ -1,4 +1,4 @@
-# power-change-alert
+# Power Change Alerter
 
 ## Summary
 
@@ -42,7 +42,7 @@ Once the above packages have been installed, load the `PowerChangeAlerter.sln` f
 
 If this is your first time downloading the repo, then you will need to do an extra step.  Browse to the `$/PowerChangeAlerter.Common` directory, and you will find a file called `settings.runtime.TEMPLATE`.  Make a copy of this JSON file, and name it `settings.runtime`.  Doing this will also resolve a Visual Studio error for missing a file in the CSPROJ file's manifest.  You would then need to file in the appropriate fields in the JSON file.
 
-> If you do not do the above step, you will get an exception when you debug or run the application.
+> If you do not do the above step, you will get an exception when you debug or run the application.  This also applies for generating a MSI file.
 
 ## Application Overview
 
