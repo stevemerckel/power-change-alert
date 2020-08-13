@@ -104,3 +104,4 @@ In no particular order...
 * Expose REST API from (random or explicit) TCP port for querying state, returning metrics, and more
 * Create base class for declaring/discovering new background worker functionality
 * Lightweight telemetry: CPU + RAM utilization
+* Unit tests, mocks
