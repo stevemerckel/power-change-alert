@@ -2,6 +2,7 @@
 using PowerChangeAlerter.Common;
 using System;
 using System.Diagnostics;
+using System.ServiceProcess;
 using System.Windows.Forms;
 
 namespace PowerChangeAlerter
@@ -12,6 +13,7 @@ namespace PowerChangeAlerter
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private DateTime _now;
+        private PowerModes _currentPowerMode = PowerModes.Resume;
 
         public HiddenForm(IAlertManager alertManager)
         {
@@ -23,19 +25,25 @@ namespace PowerChangeAlerter
 
         private void HiddenForm_Load(object sender, EventArgs e)
         {
-            SystemEvents.TimeChanged += SystemEvents_TimeChanged;
+            SystemEvents.TimeChanged += HandleTimeChanged;
+            SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
+            SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
+            SystemEvents.PowerModeChanged += HandlePowerModeChanged;
             Debug.WriteLine($"{nameof(HiddenForm_Load)} fired!");
         }
 
         private void HiddenForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SystemEvents.TimeChanged -= SystemEvents_TimeChanged;
+            SystemEvents.TimeChanged -= HandleTimeChanged;
+            SystemEvents.UserPreferenceChanged -= HandleUserPreferenceChanged;
+            SystemEvents.DisplaySettingsChanged -= HandleDisplaySettingsChanged;
+            SystemEvents.PowerModeChanged -= HandlePowerModeChanged;
             Debug.WriteLine($"{nameof(HiddenForm_FormClosing)} fired!");
         }
 
-        private void SystemEvents_TimeChanged(object sender, EventArgs e)
+        private void HandleTimeChanged(object sender, EventArgs e)
         {
-            Debug.WriteLine($"{nameof(SystemEvents_TimeChanged)} ({nameof(HiddenForm)}) hit!!");
+            Debug.WriteLine($"{nameof(HandleTimeChanged)} ({nameof(HiddenForm)}) hit!!");
 
             _stopWatch.Stop();
             DateTime previousSystemDateTime;
@@ -56,9 +64,45 @@ namespace PowerChangeAlerter
             }
 
             var newSystemDateTime = DateTime.Now;
-            var msg = $"{nameof(SystemEvents_TimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
+            var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
             Debug.WriteLine(msg);
             _alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
+        }
+
+        private void HandleUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+        {
+            Debug.WriteLine($"{nameof(HandleUserPreferenceChanged)} triggered: {e.Category}");
+        }
+
+        private void HandleDisplaySettingsChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine($"{nameof(HandleDisplaySettingsChanged)} triggered");
+        }
+
+        private void HandlePowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            Debug.WriteLine($"{nameof(HandlePowerModeChanged)} triggered: {e.Mode}");
+            PowerBroadcastStatus powerBroadcastStatus = new PowerBroadcastStatus();
+            Debug.WriteLine($"{nameof(powerBroadcastStatus)} = {powerBroadcastStatus}");
+            PowerLineStatus powerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
+            Debug.WriteLine($"{nameof(powerLineStatus)} = {powerLineStatus} --- Is Running Battery? {(powerLineStatus == PowerLineStatus.Offline)}");
+
+            switch (e.Mode)
+            {
+                case PowerModes.Resume:
+                    // online state resumed
+                    break;
+                case PowerModes.StatusChange:
+                    // status changed from AC to battery or vice-versa
+                    Debug.WriteLine($"{nameof(HandlePowerModeChanged)} received {e.Mode} -- current {nameof(PowerBroadcastStatus)} is {powerBroadcastStatus}");
+                    // todo: send notification to alert manager with the proper power notification call
+                    break;
+                case PowerModes.Suspend:
+                    // going into suspended power mode
+                    break;
+            }
+
+            _currentPowerMode = e.Mode;
         }
     }
 

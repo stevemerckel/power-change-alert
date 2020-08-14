@@ -1,22 +1,21 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.ServiceProcess;
 using PowerChangeAlerter.Common;
 using System.Windows.Forms;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace PowerChangeAlerter
 {
+    /// <summary>
+    /// Windows service for bootstrapping the monitoring of events
+    /// </summary>
     public partial class AlerterService : ServiceBase
     {
         private readonly IAppLogger _logger;
         private volatile IAlertManager _alertManager;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
-        private PowerModes _currentPowerMode = PowerModes.Resume;
-
+        
         /// <summary>
         /// ctor
         /// </summary>
@@ -30,38 +29,6 @@ namespace PowerChangeAlerter
             _alertManager = new AlertManager(runtimeSettings, _logger, fileManager);
         }
 
-        private void HandleUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
-        {
-            _logger.Info($"{nameof(HandleUserPreferenceChanged)} triggered: {e.Category}");
-        }
-
-        private void HandleDisplaySettingsChanged(object sender, EventArgs e)
-        {
-            _logger.Info($"{nameof(HandleDisplaySettingsChanged)} triggered");
-        }
-
-        private void HandlePowerModeChanged(object sender, PowerModeChangedEventArgs e)
-        {
-            _logger.Info($"{nameof(HandlePowerModeChanged)} triggered: {e.Mode}");
-            switch (e.Mode)
-            {
-                case PowerModes.Resume:
-                    // online state resumed
-                    break;
-                case PowerModes.StatusChange:
-                    // status changed from AC to battery or vice-versa
-                    var pbs = new PowerBroadcastStatus();
-                    _logger.Info($"{nameof(HandlePowerModeChanged)} received {e.Mode} -- current {nameof(PowerBroadcastStatus)} is {pbs}");
-                    // todo: send notification to alert manager with the proper power notification call
-                    break;
-                case PowerModes.Suspend:
-                    // going into suspended power mode
-                    break;
-            }
-
-            _currentPowerMode = e.Mode;
-        }
-
         public void StartService()
         {
             _alertManager.ManagerStart();
@@ -73,6 +40,10 @@ namespace PowerChangeAlerter
             t.Start();
         }
 
+        /// <summary>
+        /// Invokes the hidden form, see the form's code for the adjustments to the form's behavior and listeners
+        /// </summary>
+        /// <param name="alertManager"></param>
         private void RunMessagePump(IAlertManager alertManager)
         {
             Application.Run(new HiddenForm(alertManager));
@@ -114,16 +85,19 @@ namespace PowerChangeAlerter
             OnPowerEvent(PowerBroadcastStatus.Suspend);
         }
 
+        /// <inheritdoc />
         protected override void OnStart(string[] args)
         {
             StartService();
         }
 
+        /// <inheritdoc />
         protected override void OnStop()
         {
             StopService();
         }
 
+        /// <inheritdoc />
         protected override void OnPause()
         {
             _logger.Warn($"Entered {nameof(OnPause)}");
@@ -132,6 +106,7 @@ namespace PowerChangeAlerter
             _logger.Warn($"Exiting {nameof(OnPause)}");
         }
 
+        /// <inheritdoc />
         protected override void OnContinue()
         {
             _logger.Warn($"Entered {nameof(OnContinue)}");
@@ -140,18 +115,21 @@ namespace PowerChangeAlerter
             _logger.Warn($"Exiting {nameof(OnContinue)}");
         }
 
+        /// <inheritdoc />
         protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
         {
             _logger.Warn($"Entered {nameof(OnPowerEvent)} -- {nameof(PowerBroadcastStatus)}={powerStatus}");
             return base.OnPowerEvent(powerStatus);
         }
 
+        /// <inheritdoc />
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             _logger.Warn($"Entered {nameof(OnSessionChange)}({changeDescription})");
             base.OnSessionChange(changeDescription);
         }
 
+        /// <inheritdoc />
         protected override void OnShutdown()
         {
             _logger.Warn($"Entered {nameof(OnShutdown)}");

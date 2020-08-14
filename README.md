@@ -95,6 +95,10 @@ The service itself is setup to run with the following options:
 
 Starting the service will dump several lines of initialization information.  If you get any failures during startup, check the log files written to the location specified in the _Logging_ section above.  After the service has been running for a while, you will periodically see some "uptime minutes" messages being written to the log file.
 
+## Development Suggestions
+
+Use _DebugView_ to listen for additional `Debug` level messages that are scattered through the application.  If you have Visual Studio running at the same time, then look at its _Output_ window for the debug messages -- they are not redirected back to the debug stream when caught there.
+
 ## Future Ideas
 
 In no particular order...
