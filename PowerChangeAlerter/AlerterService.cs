@@ -3,20 +3,19 @@ using System;
 using System.Diagnostics;
 using System.ServiceProcess;
 using PowerChangeAlerter.Common;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PowerChangeAlerter
 {
     public partial class AlerterService : ServiceBase
     {
         private readonly IAppLogger _logger;
-        private readonly IAlertManager _alertManager;
+        private volatile IAlertManager _alertManager;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private PowerModes _currentPowerMode = PowerModes.Resume;
-        private Task _hiddenFormTask;
-        private HiddenForm _hiddenForm;
 
         /// <summary>
         /// ctor
@@ -67,41 +66,22 @@ namespace PowerChangeAlerter
         {
             _alertManager.ManagerStart();
 
-            // bind to system events
-            SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(HandlePowerModeChanged);
-            SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
-            SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
-
             // set up hidden form to be used as message pump
-            // Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
-            _hiddenFormTask?.Dispose();
-            _hiddenFormTask = new Task(() => RunHiddenForm());
-            _hiddenFormTask.Start();
+            // Initially Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
+            // Based on article stored by Way Back Machine --> https://web.archive.org/web/20140706130218/http://connect.microsoft.com/VisualStudio/feedback/details/241133/detecting-a-wm-timechange-event-in-a-net-windows-service
+            Thread t = new Thread(() => RunMessagePump(_alertManager));
+            t.Start();
         }
 
-        private void RunHiddenForm()
+        private void RunMessagePump(IAlertManager alertManager)
         {
-            _hiddenForm?.Dispose();
-            _hiddenForm = new HiddenForm(_alertManager)
-            {
-                FormBorderStyle = FormBorderStyle.FixedToolWindow,
-                Location = new System.Drawing.Point(-2000, -2000),
-                ShowInTaskbar = false,
-                Size = new System.Drawing.Size(1, 1),
-                StartPosition = FormStartPosition.Manual,
-                Visible = false,
-            };
-            Application.Run(_hiddenForm);
+            Application.Run(new HiddenForm(alertManager));
         }
 
         public void StopService()
         {
-            // remove bindings to system events
-            SystemEvents.PowerModeChanged -= HandlePowerModeChanged;
-            SystemEvents.DisplaySettingsChanged -= HandleDisplaySettingsChanged;
-            SystemEvents.UserPreferenceChanged -= HandleUserPreferenceChanged;
-
             _alertManager.ManagerStop();
+            Application.Exit();
         }
 
         public void PauseService()

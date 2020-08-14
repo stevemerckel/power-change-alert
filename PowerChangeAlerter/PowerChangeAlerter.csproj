@@ -179,9 +179,6 @@
     <Compile Include="HiddenForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HiddenForm.Designer.cs">
-      <DependentUpon>HiddenForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -196,9 +193,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HiddenForm.resx">
-      <DependentUpon>HiddenForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>

@@ -18,13 +18,25 @@ namespace PowerChangeAlerter
             InitializeComponent();
             Debug.WriteLine($"Entered ctor for {nameof(HiddenForm)}");
             _alertManager = alertManager;
-            SystemEvents.TimeChanged += HandleTimeChanged;
             _now = DateTime.Now;
         }
 
-        private void HandleTimeChanged(object sender, EventArgs e)
+        private void HiddenForm_Load(object sender, EventArgs e)
         {
-            Debug.WriteLine($"{nameof(HandleTimeChanged)} ({nameof(HiddenForm)}) hit!!");
+            SystemEvents.TimeChanged += SystemEvents_TimeChanged;
+            Debug.WriteLine($"{nameof(HiddenForm_Load)} fired!");
+        }
+
+        private void HiddenForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SystemEvents.TimeChanged -= SystemEvents_TimeChanged;
+            Debug.WriteLine($"{nameof(HiddenForm_FormClosing)} fired!");
+        }
+
+        private void SystemEvents_TimeChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine($"{nameof(SystemEvents_TimeChanged)} ({nameof(HiddenForm)}) hit!!");
+
             _stopWatch.Stop();
             DateTime previousSystemDateTime;
             lock (_lock)
@@ -35,7 +47,7 @@ namespace PowerChangeAlerter
                 _stopWatch.Start();
             }
 
-            const int ThresholdInSeconds = 30;
+            const int ThresholdInSeconds = 15;
             int deltaSeconds = Math.Abs((int)previousSystemDateTime.Subtract(DateTime.Now).TotalSeconds);
             if (deltaSeconds < ThresholdInSeconds)
             {
@@ -44,13 +56,38 @@ namespace PowerChangeAlerter
             }
 
             var newSystemDateTime = DateTime.Now;
-            var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
+            var msg = $"{nameof(SystemEvents_TimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
+            Debug.WriteLine(msg);
             _alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
         }
+    }
 
-        ~HiddenForm()
+    partial class HiddenForm
+    {
+        private System.ComponentModel.IContainer components = null;
+
+        protected override void Dispose(bool disposing)
         {
-            SystemEvents.TimeChanged -= HandleTimeChanged;
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private void InitializeComponent()
+        {
+            SuspendLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(0, 0);
+            FormBorderStyle = FormBorderStyle.None;
+            Name = "HiddenForm";
+            Text = "HiddenForm";
+            WindowState = FormWindowState.Minimized;
+            Load += HiddenForm_Load;
+            FormClosing += HiddenForm_FormClosing;
+            ResumeLayout(false);
         }
     }
 }
