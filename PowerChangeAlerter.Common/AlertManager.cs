@@ -4,6 +4,7 @@ using System.Management;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace PowerChangeAlerter.Common
 {
@@ -16,9 +17,10 @@ namespace PowerChangeAlerter.Common
         private int _uptimeMinutesCount = 0;
         private int _uptimeDelayInMinutes;
         private readonly object _lock = new object();
-        private Timer _uptimeTimer;
+        private System.Threading.Timer _uptimeTimer;
         private bool _isFirstUptimeLogged = false;
         private bool _isBatteryDetected;
+        private PowerLineStatus _powerSource = PowerLineStatus.Unknown;
         private readonly ISmtpHelper _smtpHelper;
 
         /// <summary>
@@ -107,7 +109,7 @@ namespace PowerChangeAlerter.Common
 
             // initialize uptime tracker
             _uptimeDelayInMinutes = _rs.IsLocalDebugging ? 1 : 20;
-            _uptimeTimer = new Timer(LogUptime);
+            _uptimeTimer = new System.Threading.Timer(LogUptime);
             _uptimeTimer.Change(0, (int)TimeSpan.FromMinutes(_uptimeDelayInMinutes).TotalMilliseconds);
 
             // report battery presence
@@ -116,6 +118,15 @@ namespace PowerChangeAlerter.Common
                 _logger.Info("Battery was found");
             else
                 _logger.Warn("No battery was found, so changes in power state will not be reported");
+
+            // report power draw
+            _powerSource = SystemInformation.PowerStatus.PowerLineStatus;
+            if (_powerSource == PowerLineStatus.Online)
+                _logger.Info($"{nameof(PowerLineStatus)} - Running on wall power");
+            else if (_powerSource == PowerLineStatus.Offline)
+                _logger.Warn($"{nameof(PowerLineStatus)} - Running on battery");
+            else
+                _logger.Error($"{nameof(PowerLineStatus)} - Unable to determine power draw source!");
         }
 
         /// <inheritdoc />
