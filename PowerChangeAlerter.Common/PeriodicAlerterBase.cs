@@ -95,7 +95,7 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <summary>
-        /// Main workflow for processing the <seealso cref="_conditionToCheck"/> and <seealso cref="_performIfConditionIsMet"/>
+        /// Main workflow for processing the <seealso cref="conditionToCheck"/> and <seealso cref="performIfConditionIsMet"/>
         /// </summary>
         /// <param name="conditionToCheck"></param>
         /// <param name="performIfConditionIsMet"></param>
