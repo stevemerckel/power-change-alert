@@ -97,7 +97,9 @@ namespace PowerChangeAlerter
                 targetService.TriggerResume();
                 Thread.Sleep(5000);
                 targetService.TriggerAcToBattery();
-                Thread.Sleep(5000);
+                Thread.Sleep(30000);
+                Thread.Sleep(30000);
+                Thread.Sleep(20000);
                 targetService.TriggerBatteryToAc();
                 logger.Info("Done with Power tests");
             });

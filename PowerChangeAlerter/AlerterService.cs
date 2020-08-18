@@ -73,11 +73,13 @@ namespace PowerChangeAlerter
         public void TriggerBatteryToAc()
         {
             OnPowerEvent(PowerBroadcastStatus.PowerStatusChange);
+            _alertManager.NotifyPowerFromWall();
         }
 
         public void TriggerAcToBattery()
         {
             OnPowerEvent(PowerBroadcastStatus.PowerStatusChange);
+            _alertManager.NotifyPowerOnBattery();
         }
 
         public void TriggerStandby()

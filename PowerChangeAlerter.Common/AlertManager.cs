@@ -4,6 +4,7 @@ using System.Management;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PowerChangeAlerter.Common
@@ -11,7 +12,7 @@ namespace PowerChangeAlerter.Common
     /// <inheritdoc />
     public sealed class AlertManager : IAlertManager
     {
-        private readonly IAppLogger _logger;
+        private volatile IAppLogger _logger;
         private readonly IRuntimeSettings _rs;
         private readonly IFileManager _fm;
         private int _uptimeMinutesCount = 0;
@@ -21,7 +22,10 @@ namespace PowerChangeAlerter.Common
         private bool _isFirstUptimeLogged = false;
         private bool _isBatteryDetected;
         private PowerLineStatus _powerSource = PowerLineStatus.Unknown;
-        private readonly ISmtpHelper _smtpHelper;
+        private volatile ISmtpHelper _smtpHelper;
+
+        private Task _taskRunningOnBattery;
+        private CancellationTokenSource _ctsBattery;
 
         /// <summary>
         /// ctor
@@ -144,29 +148,77 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void NotifyPowerFromWall()
         {
-            if (!_isBatteryDetected)
+            //if (!_isBatteryDetected)
+            //{
+            //    _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
+            //    return;
+            //}
+
+            if (_taskRunningOnBattery == null)
             {
-                _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
+                _logger.Warn($"Received call to {nameof(NotifyPowerFromWall)} but the battery task {nameof(_taskRunningOnBattery)} was not running.  Exit early.");
                 return;
             }
 
-            var message = "Changed to battery power";
+            _ctsBattery?.Cancel();
+            var message = "Changed to wall power";
             _logger.Info(message);
-            _smtpHelper.Send("Power Now on Battery", message);
+            _smtpHelper.Send("Power on Wall", message);
         }
 
         /// <inheritdoc />
         public void NotifyPowerOnBattery()
         {
-            if (!_isBatteryDetected)
+            //if (!_isBatteryDetected)
+            //{
+            //    _logger.Warn($"{nameof(NotifyPowerOnBattery)} was triggered but there is no connected battery... wtf??");
+            //    return;
+            //}
+
+            if (_taskRunningOnBattery?.Status == TaskStatus.Running)
             {
-                _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
+                _logger.Warn($"{nameof(NotifyPowerOnBattery)} was triggered but is apparently still running.  Exiting early.");
                 return;
             }
 
-            var message = "Changed to wall power";
-            _logger.Info(message);
-            _smtpHelper.Send("Power Now on Wall", message);
+            // send periodic alerts until cancellation
+            _ctsBattery = new CancellationTokenSource();
+            _taskRunningOnBattery = new Task(() => SendBatteryNotices(_logger, _smtpHelper, _ctsBattery.Token), TaskCreationOptions.LongRunning);
+            _taskRunningOnBattery.Start();
+        }
+
+        private void SendBatteryNotices(IAppLogger logger, ISmtpHelper smtp, CancellationToken token)
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            const int DelayBetweenResendingAlertInMinutes = 10;
+            var delayBetweenResendingAlertInSeconds = TimeSpan.FromMinutes(DelayBetweenResendingAlertInMinutes).TotalSeconds;
+            const int DelayBetweenCheckingTokenInSeconds = 5;
+            var message = $"Changed to battery power!  Will send reminder every {DelayBetweenResendingAlertInMinutes} minutes.";
+            logger.Info(message);
+            smtp.Send("Power on Battery", message);
+
+            var tokenCheckDelayInMilliseconds = (int)TimeSpan.FromSeconds(DelayBetweenCheckingTokenInSeconds).TotalMilliseconds;
+            var intervalCountOfDelayUntilResend = (int)(TimeSpan.FromSeconds(delayBetweenResendingAlertInSeconds).TotalMilliseconds / tokenCheckDelayInMilliseconds);
+            var resendCount = 0;
+            while (true)
+            {
+                for (var i = 0; i < intervalCountOfDelayUntilResend; i++)
+                {
+                    if (token.IsCancellationRequested)
+                        break;
+                    Thread.Sleep(tokenCheckDelayInMilliseconds);
+                }
+
+                if (token.IsCancellationRequested)
+                    break;
+
+                // still on battery, send additional notice
+                resendCount++;
+                var repeatMessage = $"Still on battery for about {DelayBetweenResendingAlertInMinutes * resendCount} minutes";
+                smtp.Send("Power on Battery", repeatMessage);
+            }
         }
 
         /// <inheritdoc />
