@@ -14,6 +14,7 @@ namespace PowerChangeAlerter
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private DateTime _now;
         private PowerModes _currentPowerMode = PowerModes.Resume;
+        private PowerLineStatus _currentPowerLineStatus = PowerLineStatus.Unknown;
 
         public HiddenForm(IAlertManager alertManager)
         {
@@ -95,7 +96,20 @@ namespace PowerChangeAlerter
                 case PowerModes.StatusChange:
                     // status changed from AC to battery or vice-versa
                     Debug.WriteLine($"{nameof(HandlePowerModeChanged)} received {e.Mode} -- current {nameof(PowerBroadcastStatus)} is {powerBroadcastStatus}");
-                    // todo: send notification to alert manager with the proper power notification call
+                    switch(powerLineStatus)
+                    {
+                        case PowerLineStatus.Online:
+                            _alertManager.NotifyPowerFromWall();
+                            break;
+                        case PowerLineStatus.Offline:
+                            _alertManager.NotifyPowerOnBattery();
+                            break;
+                        case PowerLineStatus.Unknown:
+                            Debug.WriteLine($"Unable to process value '{powerBroadcastStatus}'.  Exiting early.");
+                            break;
+                        default:
+                            throw new NotSupportedException($"Unsure how to handle status of '{powerLineStatus}' !!");
+                    }
                     break;
                 case PowerModes.Suspend:
                     // going into suspended power mode
@@ -103,6 +117,7 @@ namespace PowerChangeAlerter
             }
 
             _currentPowerMode = e.Mode;
+            _currentPowerLineStatus = powerLineStatus;
         }
     }
 
