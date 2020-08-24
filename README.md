@@ -8,6 +8,12 @@ The intent is to have a notification when power is lost on a known electricl cir
 
 One possible use-case for this is to provide a "heads-up" notice to home owners if there are items depending on constant electricity, such as freezers, refrigerators, garage door openers, and various IoT devices.
 
+## Initial Need
+
+Having UPS systems in the house to keep things alive during brown- or blackouts is great.  However, excessive outtages that happen while away from the house can lead to unexpected consequences.  For example, several hundred dollars worth of food in a refrigerator can become spoiled while you are away for a weekend.
+
+The immediate need was to write an application to send notices to my cell phone.  I happened to have a spare laptop laying around, so it made sense to rely on its internal message pump as it changed from wall power to battery (and vice-versa).  Combine that with a free email address service and how a cell provider can translate SMTP messages to cellular text messages, and I had a working concept.  The first implementation was done as a Windows Service solely from my own familiarity, and it was a quick means to an end.
+
 ## Technologies
 
 * C# Windows Service
@@ -108,4 +114,6 @@ In no particular order...
 * Expose REST API from (random or explicit) TCP port for querying state, returning metrics, and more
 * Create base class for declaring/discovering new background worker functionality
 * Lightweight telemetry: CPU + RAM utilization
+* Track internet uptime, send outtage notice after service is restored
 * Unit tests, mocks
+* Look at Arduino, with a battery, and modify as needed to get a POC working on that platform
