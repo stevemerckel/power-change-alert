@@ -6,11 +6,6 @@
     public static class StaticVariables
     {
         /// <summary>
-        /// The display vendor name
-        /// </summary>
-        public static string VendorName = "SSM, LLC";
-
-        /// <summary>
         /// The display product name
         /// </summary>
         public static string ProductName = "Power Change Alerter";

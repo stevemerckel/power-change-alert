@@ -76,7 +76,7 @@ Serilog is used for capturing and routing log messages.  By default, it is setup
 Where the log files are written depends on how the application is started:
 
 * **Visual Studio Debugging or Command-line -** Look for a `logs` directory under the runtime's EXE location, usually in the `bin` directory
-* **Registered as a Windows Service -** `C:\ProgramData\SSM, LLC\logs`
+* **Registered as a Windows Service -** `C:\ProgramData\Power Change Alerter\logs`
 
 ## Create Installer
 

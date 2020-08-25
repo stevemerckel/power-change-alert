@@ -39,7 +39,7 @@ namespace PowerChangeAlerter.Common
             // - for executing as process or windows service, write to vendor/app folder in CommonApplicationData directory
             var logDirectory = Utility.IsDebugging
                 ? "./logs"
-                : fileManager.PathCombine(fileManager.EnvironmentGetFolderPath(Environment.SpecialFolder.CommonApplicationData), StaticVariables.VendorName, "logs");
+                : fileManager.PathCombine(fileManager.EnvironmentGetFolderPath(Environment.SpecialFolder.CommonApplicationData), StaticVariables.ProductName, "logs");
 
             logDirectory = logDirectory.Replace(@"\\", "/").Replace(@"\", "/");
             if (logDirectory.EndsWith("/"))
