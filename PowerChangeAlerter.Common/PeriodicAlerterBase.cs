@@ -23,10 +23,7 @@ namespace PowerChangeAlerter.Common
         /// <param name="logger">Logger implementation</param>
         protected PeriodicAlerterBase(IAppLogger logger)
         {
-            _logger = logger;
-
-            if (_logger == null)
-                throw new ArgumentNullException(nameof(IAppLogger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             throw new NotImplementedException($"{nameof(PeriodicAlerterBase)} has not yet been approved for primetime.");
         }
@@ -104,11 +101,23 @@ namespace PowerChangeAlerter.Common
         {
             var typeName = GetType().Name;
             var token = _cts.Token;
+            if (token.IsCancellationRequested)
+            {
+                _logger.Warn($"Cancellation token was set on '{typeName}' before {nameof(conditionToCheck)} fired.  Exiting early.");
+                return;
+            }
+
             var shouldRun = conditionToCheck(token);
             if (!shouldRun)
             {
                 _logger.Info($"Was going to start {typeName}, but the {nameof(conditionToCheck)} evaluated to {shouldRun}");
                 SetIsRunning(false);
+                return;
+            }
+
+            if (token.IsCancellationRequested)
+            {
+                _logger.Warn($"Cancellation token was set on '{typeName}' before {nameof(performIfConditionIsMet)} fired.  Exiting early.");
                 return;
             }
 
@@ -127,7 +136,7 @@ namespace PowerChangeAlerter.Common
                 SetIsRunning(false);
             }
 
-            _logger.Info($"Exiting from {nameof(RunProcess)} for '{typeName}' -- cancellation token's {nameof(_cts.Token.IsCancellationRequested)} was {_cts.Token.IsCancellationRequested}");
+            _logger.Info($"Exiting from {nameof(RunProcess)} for '{typeName}' -- cancellation token's {nameof(token.IsCancellationRequested)} was {token.IsCancellationRequested}");
         }
 
         /// <summary>
