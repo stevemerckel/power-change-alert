@@ -1,13 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-
-namespace PowerChangeAlerter.Common
+﻿namespace PowerChangeAlerter.Common
 {
     /// <inheritdoc />
     public sealed class RuntimeSettings : IRuntimeSettings
     {
         /// <inheritdoc />
-        public bool IsLocalDebugging => Environment.UserInteractive && Debugger.IsAttached;
+        public bool IsLocalDebugging => Utility.IsDebugging;
 
         /// <inheritdoc />
         public string EmailSenderName { get; set; }
