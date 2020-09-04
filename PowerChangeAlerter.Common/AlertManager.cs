@@ -131,6 +131,10 @@ namespace PowerChangeAlerter.Common
                 _logger.Warn($"{nameof(PowerLineStatus)} - Running on battery");
             else
                 _logger.Error($"{nameof(PowerLineStatus)} - Unable to determine power draw source!");
+
+            // if on battery power mode, then drop into notification logic
+            if (_powerSource == PowerLineStatus.Offline)
+                NotifyPowerOnBattery();
         }
 
         /// <inheritdoc />
