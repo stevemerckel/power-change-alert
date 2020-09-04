@@ -53,8 +53,10 @@ namespace PowerChangeAlerter.Common
             _timer = new Timer(BootstrapProcess, null, _startupDelayInMilliseconds, Timeout.Infinite);
         }
 
+        /// <inheritdoc />
         public abstract void ActionToPerform(CancellationToken token);
 
+        /// <inheritdoc />
         public abstract bool ConditionToCheck(CancellationToken token);
 
         /// <summary>
