@@ -30,7 +30,7 @@ namespace PowerChangeAlerter.Common
         bool FileExists(string fileLocation);
 
         /// <summary>
-        /// Resets the URLZONE enum on a file to UNTRUSTED.  This is to unblock files from being used, which typically happens on on remotely downloaded EXEs (even those extracted from a downloaded ZIP file).
+        /// Resets the URLZONE enum on a file to UNTRUSTED.  This is to unblock files from being used, which typically happens on on remotely downloaded EXEs (even those extracted from a downloaded ZIP file).  To see if a file is blocked, use the <seealso cref="IsFileBlocked(string)"/> function.
         /// </summary>
         /// <remarks>
         /// This is essentially the same as right-clicking a downloaded EXE, choosing "Properties", ticking the "Unblock" checkbox from the bottom of the modal, and clicking "Ok" or "Apply".
@@ -38,6 +38,17 @@ namespace PowerChangeAlerter.Common
         /// </remarks>
         /// <param name="fileLocation">Location of the file to unblock</param>
         void UnblockFile(string fileLocation);
+
+        /// <summary>
+        /// Checks whether the URLZONE enum on a file would show this file as blocked in the File Properties.  To unblock a file, use <seealso cref="UnblockFile(string)"/> method.
+        /// </summary>
+        /// <remarks>
+        /// <para>This is essentially the same as right-clicking a downloaded EXE, choosing "Properties", and seeing if the "Unblock" checkbox exists at the bottom of the modal.</para>
+        /// <para>More info here: https://blogs.msmvps.com/bsonnino/2016/11/24/alternate-data-streams-in-c/</para>
+        /// </remarks>
+        /// <param name="fileLocation">Location of the file to inspect</param>
+        /// <returns>Boolean indicating whether the file is blocked or not</returns>
+        bool IsFileBlocked(string fileLocation);
 
         /// <summary>
         /// <para>Returns the parent directory path.</para>

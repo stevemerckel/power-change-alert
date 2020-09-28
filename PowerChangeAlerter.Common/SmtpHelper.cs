@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -10,6 +11,7 @@ namespace PowerChangeAlerter.Common
     {
         private readonly IAppLogger _logger;
         private readonly IRuntimeSettings _runtimeSettings;
+        private readonly bool _isEmailSendingAllowed = true; // important to default to "true", only override for unit tests
 
         /// <summary>
         /// SMTP email sender object
@@ -20,6 +22,17 @@ namespace PowerChangeAlerter.Common
         {
             _runtimeSettings = runtimeSettings;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// SMTP email sender object for use by unit- and integration-tests.
+        /// </summary>
+        /// <param name="runtimeSettings">Runtime settings</param>
+        /// <param name="logger">Application logger instance</param>
+        /// <param name="isEmailSendingAllowed">Whether to actually send emails (<c>true</c>) or to skip the actual sending of a message (<c>false</c>)</param>
+        internal SmtpHelper(IRuntimeSettings runtimeSettings, IAppLogger logger, bool isEmailSendingAllowed) : this(runtimeSettings, logger)
+        {
+            _isEmailSendingAllowed = isEmailSendingAllowed;
         }
 
         /// <inheritdoc />
@@ -41,19 +54,18 @@ namespace PowerChangeAlerter.Common
             MailMessage mm = null;
             try
             {
-                _logger?.Info("Creating mail message");
+                Debug.WriteLine("Creating mail message");
                 mm = new MailMessage
                 {
                     BodyEncoding = Encoding.UTF8,
                     IsBodyHtml = false,
-                    //Priority = MailPriority.High,
                     From = new MailAddress(_runtimeSettings.EmailSenderAddress, _runtimeSettings.EmailSenderName ?? _runtimeSettings.EmailSenderAddress),
                     Subject = subject,
                     Body = body
                 };
                 mm.To.Add(new MailAddress(_runtimeSettings.EmailRecipientAddress, _runtimeSettings.EmailRecipientName ?? _runtimeSettings.EmailRecipientAddress));
 
-                _logger?.Info("Creating SMTP Client");
+                Debug.WriteLine("Creating SMTP Client");
                 client = new SmtpClient
                 {
                     Host = _runtimeSettings.EmailSmtpServer,
@@ -65,8 +77,15 @@ namespace PowerChangeAlerter.Common
                     Timeout = 30000
                 };
 
-                _logger?.Info("Sending message...");
-                client.Send(mm);
+                if (_isEmailSendingAllowed)
+                {
+                    Debug.WriteLine("Sending message...");
+                    client.Send(mm);
+                }
+                else
+                {
+                    _logger.Warn($"Did not send email because {nameof(_isEmailSendingAllowed)} was {_isEmailSendingAllowed}");
+                }
             }
             catch (SmtpException smtpEx)
             {

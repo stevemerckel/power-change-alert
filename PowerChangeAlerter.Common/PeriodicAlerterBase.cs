@@ -6,7 +6,7 @@ namespace PowerChangeAlerter.Common
     /// <summary>
     /// Abstract set of features for periodic alerts.  All implementations of <seealso cref="IPeriodicAlerter"/> should instead inherit from this base class.
     /// </summary>
-    [Obsolete("Any implementations are not ready for primetime... yet")]
+    [Obsolete("Any implementations are not ready for primetime... yet", false)]
     public abstract class PeriodicAlerterBase : IPeriodicAlerter
     {
         private readonly IAppLogger _logger;

@@ -1,4 +1,7 @@
-﻿namespace PowerChangeAlerter.Common
+﻿using System;
+using System.Net.Mail;
+
+namespace PowerChangeAlerter.Common
 {
     /// <inheritdoc />
     public sealed class RuntimeSettings : IRuntimeSettings
@@ -32,5 +35,31 @@
 
         /// <inheritdoc />
         public string EmailSmtpLogonPassword { get; set; }
+
+        /// <inheritdoc />
+        public void Validate()
+        {
+            if (string.IsNullOrWhiteSpace(EmailSenderAddress))
+                throw new ArgumentException(nameof(EmailSenderAddress));
+
+            var mm = new MailAddress(EmailSenderAddress);
+
+            if (string.IsNullOrWhiteSpace(EmailSmtpServer))
+                throw new ArgumentException(nameof(EmailSmtpServer));
+
+            if (EmailSmtpPort < 1 || EmailSmtpPort > 65536)
+                throw new ArgumentException(nameof(EmailSmtpPort));
+
+            if (string.IsNullOrWhiteSpace(EmailRecipientAddress))
+                throw new ArgumentException(nameof(EmailRecipientAddress));
+
+            mm = new MailAddress(EmailRecipientAddress);
+
+            if (string.IsNullOrWhiteSpace(EmailSmtpLogonName))
+                throw new ArgumentException(nameof(EmailSmtpLogonName));
+
+            if (string.IsNullOrWhiteSpace(EmailSmtpLogonPassword))
+                throw new ArgumentException(nameof(EmailSmtpLogonPassword));
+        }
     }
 }

@@ -46,12 +46,12 @@ namespace PowerChangeAlerter.Common
             }
 
             if (!isSettingsFileFound)
-                throw new Exception($"Could not find file '{RuntimeSettingsFileName}' at '{executingDirectory}'  (or any sub-directories) -- Ensure that the file '{RuntimeSettingsFileName}' exists in the runtime directory, and is based on the file '{RuntimeSettingsTemplateFileName}'.");
+                throw new System.IO.FileNotFoundException($"Could not find file '{RuntimeSettingsFileName}' at '{executingDirectory}'  (or any sub-directories) -- Ensure that the file '{RuntimeSettingsFileName}' exists in the runtime directory, and is based on the file '{RuntimeSettingsTemplateFileName}'.");
 
             // read JSON content and hydrate properties
             var contents = _fm.ReadAllText(runtimeSettingsFileLocation);
             if (string.IsNullOrWhiteSpace(contents))
-                throw new Exception($"The '{RuntimeSettingsFileName}' file was found but had no content! -- file location = {runtimeSettingsFileLocation}");
+                throw new System.IO.FileLoadException($"The '{RuntimeSettingsFileName}' file was found but had no content! -- file location = {runtimeSettingsFileLocation}");
 
             RuntimeSettings target;
             try

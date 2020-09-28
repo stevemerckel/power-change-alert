@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerChangeAlerter.Sandbox"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "PowerChangeAlerter.Install", "PowerChangeAlerter.Install\PowerChangeAlerter.Install.wixproj", "{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerChangeAlerter.Tests", "PowerChangeAlerter.Tests\PowerChangeAlerter.Tests.csproj", "{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Projects", "Test Projects", "{B691D055-501A-4EBB-8EFD-6229C0E9A36B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,9 +53,20 @@ Global
 		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|Any CPU.ActiveCfg = Release|x86
 		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|x86.ActiveCfg = Release|x86
 		{A5C9EBFB-F2E1-4E66-9C3F-47C98289DAAA}.Release|x86.Build.0 = Release|x86
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Debug|x86.Build.0 = Debug|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Release|x86.ActiveCfg = Release|Any CPU
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{48EAE3CC-DFDC-44ED-A5F1-D1170A65EC06} = {B691D055-501A-4EBB-8EFD-6229C0E9A36B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4CB0ED22-63BF-44AF-B781-98879BB2F865}

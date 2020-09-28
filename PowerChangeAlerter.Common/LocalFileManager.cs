@@ -90,5 +90,15 @@ namespace PowerChangeAlerter.Common
         {
             return Environment.GetFolderPath(specialFolder);
         }
+
+        /// <inheritdoc />
+        public bool IsFileBlocked(string fileLocation)
+        {
+            if (!FileExists(fileLocation))
+                throw new FileNotFoundException("Cannot inspect a file that cannot be found!");
+
+            const string AlternateDataStreamNameToRemove = "Zone.Identifier";
+            return new FileInfo(fileLocation).AlternateDataStreamExists(AlternateDataStreamNameToRemove);
+        }
     }
 }
