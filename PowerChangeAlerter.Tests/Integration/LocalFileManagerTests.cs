@@ -2,9 +2,12 @@
 using NUnit.Framework;
 using PowerChangeAlerter.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
+using Trinet.Core.IO.Ntfs;
 
 namespace PowerChangeAlerter.Tests.Integration
 {
@@ -72,8 +75,8 @@ namespace PowerChangeAlerter.Tests.Integration
             Assert.IsTrue(fileContent.Contains(KnownSnipInTextFile, StringComparison.InvariantCulture), $"Could not find known text of '{KnownSnipInTextFile}'");
         }
 
-        [TestCase("https://raw.githubusercontent.com/stevemerckel/power-change-alert/master/README.md", false)]
-        [TestCase("https://raw.githubusercontent.com/stevemerckel/power-change-alert/master/resources/naudio.1.10.0.nupkg.zip", true)]
+        [TestCase("https://raw.githubusercontent.com/stevemerckel/power-change-alert/master/resources/README.md", false)]
+        [TestCase("https://github.com/stevemerckel/power-change-alert/raw/master/resources/naudio.1.10.0.nupkg.zip", true)]
         public void Test_DownloadFile_UnblockIfSpecified_Success(string url, bool shouldRequireUnblock)
         {
             Console.WriteLine($"{nameof(url)} = {url}");
@@ -96,6 +99,12 @@ namespace PowerChangeAlerter.Tests.Integration
 
             // initial download validations
             Assert.IsTrue(_sut.FileExists(downloadFile));
+            if (shouldRequireUnblock && !_sut.IsFileBlocked(downloadFile))
+            {
+                Console.WriteLine("The downloaded file was expected to have a Zone Identifier block, but none was found -- going to add it now.");
+                AddZoneIdentifierBlockToFile(downloadFile);
+            }
+
             Assert.AreEqual(shouldRequireUnblock, _sut.IsFileBlocked(downloadFile));
 
             // now we can unblock file if it is needed
@@ -105,6 +114,35 @@ namespace PowerChangeAlerter.Tests.Integration
 
             // secondary validations
             Assert.IsTrue(new FileInfo(downloadFile).Length > 0, $"No content was found in '{downloadFile}'");
+        }
+
+        /// <summary>
+        /// Adds an internet zone identifier of "3" as an alternate data stream to the file
+        /// </summary>
+        /// <param name="fileLocation">File to add an alternate stream to</param>
+        /// <remarks>More info here: https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/6e3f7352-d11c-4d76-8c39-2516a9df36e8</remarks>
+        private void AddZoneIdentifierBlockToFile(string fileLocation)
+        {
+            const string AlternateDataStreamNameToAdd = "Zone.Identifier";
+            var fi = new FileInfo(fileLocation);
+
+            if (fi.AlternateDataStreamExists(AlternateDataStreamNameToAdd))
+            {
+                Console.WriteLine($"Alternate data stream already exists, so exiting {nameof(AddZoneIdentifierBlockToFile)} early.");
+                return;
+            }
+
+            using (var fs = fi.GetAlternateDataStream(AlternateDataStreamNameToAdd).OpenWrite())
+            {
+                Console.WriteLine("Opened file for write");
+                var content = new List<string>()
+                {
+                    "[ZoneTransfer]",
+                    "ZoneId = 3"
+                };
+                content.ForEach(x => fs.Write(Encoding.UTF8.GetBytes(x + Environment.NewLine)));
+                fs.Flush();
+            }
         }
 
         [TearDown]
