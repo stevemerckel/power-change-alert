@@ -10,17 +10,19 @@ namespace PowerChangeAlerter
     public partial class HiddenForm : Form
     {
         private readonly IAlertManager _alertManager;
+        private readonly IAppLogger _logger;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private DateTime _now;
         private PowerModes _currentPowerMode = PowerModes.Resume;
         private PowerLineStatus _currentPowerLineStatus = PowerLineStatus.Unknown;
 
-        public HiddenForm(IAlertManager alertManager)
+        public HiddenForm(IAlertManager alertManager, IAppLogger logger)
         {
             InitializeComponent();
             Debug.WriteLine($"Entered ctor for {nameof(HiddenForm)}");
-            _alertManager = alertManager;
+            _alertManager = alertManager ?? throw new ArgumentNullException(nameof(alertManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _now = DateTime.Now;
         }
 

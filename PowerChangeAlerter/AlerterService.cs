@@ -3,6 +3,7 @@ using System.ServiceProcess;
 using PowerChangeAlerter.Common;
 using System.Windows.Forms;
 using System.Threading;
+using System;
 
 namespace PowerChangeAlerter
 {
@@ -12,7 +13,7 @@ namespace PowerChangeAlerter
     public partial class AlerterService : ServiceBase
     {
         private readonly IAppLogger _logger;
-        private volatile IAlertManager _alertManager;
+        private readonly IAlertManager _alertManager;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
         
@@ -25,7 +26,7 @@ namespace PowerChangeAlerter
         public AlerterService(IRuntimeSettings runtimeSettings, IAppLogger logger, IFileManager fileManager)
         {
             InitializeComponent();
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _alertManager = new AlertManager(runtimeSettings, _logger, fileManager);
         }
 
@@ -36,17 +37,16 @@ namespace PowerChangeAlerter
             // set up hidden form to be used as message pump
             // Initially Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
             // Based on article stored by Way Back Machine --> https://web.archive.org/web/20140706130218/http://connect.microsoft.com/VisualStudio/feedback/details/241133/detecting-a-wm-timechange-event-in-a-net-windows-service
-            Thread t = new Thread(() => RunMessagePump(_alertManager));
+            Thread t = new Thread(() => RunMessagePump(_alertManager, _logger));
             t.Start();
         }
 
         /// <summary>
         /// Invokes the hidden form, see the form's code for the adjustments to the form's behavior and listeners
         /// </summary>
-        /// <param name="alertManager"></param>
-        private void RunMessagePump(IAlertManager alertManager)
+        private void RunMessagePump(IAlertManager alertManager, IAppLogger logger)
         {
-            Application.Run(new HiddenForm(alertManager));
+            Application.Run(new HiddenForm(alertManager, logger));
         }
 
         public void StopService()
