@@ -20,11 +20,12 @@ namespace PowerChangeAlerter
         [CodeEntry]
         public HiddenForm(IAlertManager alertManager, IAppLogger logger)
         {
-            InitializeComponent();
             Debug.WriteLine($"Entered ctor for {nameof(HiddenForm)}");
             _alertManager = alertManager ?? throw new ArgumentNullException(nameof(alertManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _now = DateTime.Now;
+
+            InitializeComponent();
         }
 
         [CodeEntry]
