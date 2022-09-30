@@ -45,5 +45,12 @@ namespace PowerChangeAlerter.Tests.Unit
             else
                 Assert.IsTrue(characters.All(x => !char.IsDigit(x)), $"Found numbers, but was told not to include them!! -- {generated}");
         }
+
+        [Test]
+        public void Test_CodeEntryAttribute_Success()
+        {
+            var codeEntryAttribute = new CodeEntryAttribute();
+            Assert.AreEqual(1, codeEntryAttribute.HitCount);
+        }
     }
 }

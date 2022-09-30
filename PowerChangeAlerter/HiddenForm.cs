@@ -17,6 +17,7 @@ namespace PowerChangeAlerter
         private PowerModes _currentPowerMode = PowerModes.Resume;
         private PowerLineStatus _currentPowerLineStatus = PowerLineStatus.Unknown;
 
+        [CodeEntry]
         public HiddenForm(IAlertManager alertManager, IAppLogger logger)
         {
             InitializeComponent();
@@ -26,28 +27,27 @@ namespace PowerChangeAlerter
             _now = DateTime.Now;
         }
 
+        [CodeEntry]
         private void HiddenForm_Load(object sender, EventArgs e)
         {
             SystemEvents.TimeChanged += HandleTimeChanged;
             SystemEvents.UserPreferenceChanged += HandleUserPreferenceChanged;
             SystemEvents.DisplaySettingsChanged += HandleDisplaySettingsChanged;
             SystemEvents.PowerModeChanged += HandlePowerModeChanged;
-            Debug.WriteLine($"{nameof(HiddenForm_Load)} fired!");
         }
 
+        [CodeEntry]
         private void HiddenForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             SystemEvents.TimeChanged -= HandleTimeChanged;
             SystemEvents.UserPreferenceChanged -= HandleUserPreferenceChanged;
             SystemEvents.DisplaySettingsChanged -= HandleDisplaySettingsChanged;
             SystemEvents.PowerModeChanged -= HandlePowerModeChanged;
-            Debug.WriteLine($"{nameof(HiddenForm_FormClosing)} fired!");
         }
 
+        [CodeEntry]
         private void HandleTimeChanged(object sender, EventArgs e)
         {
-            Debug.WriteLine($"{nameof(HandleTimeChanged)} ({nameof(HiddenForm)}) hit!!");
-
             _stopWatch.Stop();
             DateTime previousSystemDateTime;
             lock (_lock)
@@ -82,9 +82,9 @@ namespace PowerChangeAlerter
             Debug.WriteLine($"{nameof(HandleDisplaySettingsChanged)} triggered");
         }
 
+        [CodeEntry]
         private void HandlePowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
-            Debug.WriteLine($"{nameof(HandlePowerModeChanged)} triggered: {e.Mode}");
             PowerBroadcastStatus powerBroadcastStatus = new PowerBroadcastStatus();
             Debug.WriteLine($"{nameof(powerBroadcastStatus)} = {powerBroadcastStatus}");
             PowerLineStatus powerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;

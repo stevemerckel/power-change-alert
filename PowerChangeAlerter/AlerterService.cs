@@ -35,7 +35,7 @@ namespace PowerChangeAlerter
             _alertManager.ManagerStart();
 
             // set up hidden form to be used as message pump
-            // Initially Based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
+            // Initially based on StackOverflow idea --> https://stackoverflow.com/questions/9725180/c-sharp-event-to-detect-daylight-saving-or-even-manual-time-change
             // Based on article stored by Way Back Machine --> https://web.archive.org/web/20140706130218/http://connect.microsoft.com/VisualStudio/feedback/details/241133/detecting-a-wm-timechange-event-in-a-net-windows-service
             Thread t = new Thread(() => RunMessagePump(_alertManager, _logger));
             t.Start();
