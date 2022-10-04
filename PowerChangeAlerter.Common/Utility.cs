@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;

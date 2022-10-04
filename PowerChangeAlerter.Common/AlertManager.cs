@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Management;
 using System.ServiceProcess;
 using System.Text;
@@ -152,12 +151,6 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void NotifyPowerFromWall()
         {
-            //if (!_isBatteryDetected)
-            //{
-            //    _logger.Warn($"{nameof(NotifyPowerFromWall)} was triggered but there is no connected battery... wtf??");
-            //    return;
-            //}
-
             if (_taskRunningOnBattery == null)
             {
                 _logger.Warn($"Received call to {nameof(NotifyPowerFromWall)} but the battery task {nameof(_taskRunningOnBattery)} was not running.  Exit early.");
@@ -173,12 +166,6 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void NotifyPowerOnBattery()
         {
-            //if (!_isBatteryDetected)
-            //{
-            //    _logger.Warn($"{nameof(NotifyPowerOnBattery)} was triggered but there is no connected battery... wtf??");
-            //    return;
-            //}
-
             if (_taskRunningOnBattery?.Status == TaskStatus.Running)
             {
                 _logger.Warn($"{nameof(NotifyPowerOnBattery)} was triggered but is apparently still running.  Exiting early.");
@@ -191,7 +178,7 @@ namespace PowerChangeAlerter.Common
             _taskRunningOnBattery.Start();
         }
 
-        private void SendBatteryNotices(IAppLogger logger, ISmtpHelper smtp, CancellationToken token)
+        private async void SendBatteryNotices(IAppLogger logger, ISmtpHelper smtp, CancellationToken token)
         {
             if (token.IsCancellationRequested)
                 return;
@@ -212,7 +199,7 @@ namespace PowerChangeAlerter.Common
                 {
                     if (token.IsCancellationRequested)
                         break;
-                    Thread.Sleep(tokenCheckDelayInMilliseconds);
+                    await Task.Delay(tokenCheckDelayInMilliseconds);
                 }
 
                 if (token.IsCancellationRequested)
@@ -235,7 +222,7 @@ namespace PowerChangeAlerter.Common
 
             var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
             _logger.Info(message);
-            Debug.WriteLine($"{nameof(NotifyTimeChange)} - {message}");
+            _logger.Debug($"{nameof(NotifyTimeChange)} - {message}");
             _smtpHelper.Send("Time Change", message);
         }
     }
