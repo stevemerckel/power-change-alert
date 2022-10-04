@@ -56,7 +56,7 @@ namespace PowerChangeAlerter.Common
             }
 
             _uptimeMinutesCount += _uptimeDelayInMinutes;
-            _logger.Info($"{nameof(LogUptime)} running for {_uptimeMinutesCount} minutes");
+            _logger.Debug($"{nameof(LogUptime)} running for {_uptimeMinutesCount} minutes");
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using PowerChangeAlerter.Common;
 using System;
 using System.Diagnostics;
+using System.Management;
 using System.ServiceProcess;
 using System.Windows.Forms;
 
@@ -20,12 +21,64 @@ namespace PowerChangeAlerter
         [CodeEntry]
         public HiddenForm(IAlertManager alertManager, IAppLogger logger)
         {
-            Debug.WriteLine($"Entered ctor for {nameof(HiddenForm)}");
             _alertManager = alertManager ?? throw new ArgumentNullException(nameof(alertManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _now = DateTime.Now;
 
+            // fetch and assign current power line status and power status
+            _currentPowerLineStatus = GetCurrentPowerLineStatus();
+
             InitializeComponent();
+
+            // if we are running on battery, kick off alerts to outside listener
+            if (_currentPowerLineStatus == PowerLineStatus.Offline)
+                _alertManager.NotifyPowerOnBattery();
+        }
+
+        /// <summary>
+        /// Returns current power line status of system
+        /// </summary>
+        /// <remarks>
+        /// Pointer on which WMI call to make was found here: https://devblogs.microsoft.com/scripting/how-can-i-tell-whether-a-laptop-computer-is-running-off-batteries/
+        /// </remarks>
+        private PowerLineStatus GetCurrentPowerLineStatus()
+        {
+            //var wmiRoot = $@"winmgmts:\\.\root\wmi";
+            var wmiRoot = $@"\\.\root\wmi";
+            ManagementScope scope = new ManagementScope(wmiRoot);
+            scope.Connect();
+            ObjectQuery query = new ObjectQuery("SELECT * FROM BatteryStatus WHERE Voltage > 0");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query);
+            var queryResults = searcher.Get();
+            PowerLineStatus status = PowerLineStatus.Unknown;
+            try
+            {
+                foreach (var mo in queryResults)
+                {
+                    const string TargetPropertyName = "PowerOnline";
+                    var isUsingWallPower = false;
+                    var wasFound = bool.TryParse(mo[TargetPropertyName].ToString(), out isUsingWallPower);
+                    if (!wasFound)
+                    {
+                        _logger.Warn($"Could not find '{TargetPropertyName}' in WMI query results !!");
+                    }
+                    else
+                    {
+                        status = isUsingWallPower ? PowerLineStatus.Online : PowerLineStatus.Offline;
+                    }
+                }
+            }
+            catch (ManagementException managementEx)
+            {
+                // Expected root cause is that this device does not have a battery at all.
+                // For now we will assume wall power, and set the return value to that status.
+                // Note: Querying "BatteryStatus" throws in this case, but "Win32_Battery" does not.
+                // REFACTOR: See if there is a more elegant way to interrogate and fall-through.
+                _logger.Warn($"Failed to enumerate query results -- reason: {managementEx}");
+                status = PowerLineStatus.Online;
+            }
+
+            return status;
         }
 
         [CodeEntry]

@@ -6,6 +6,12 @@
     public interface IAppLogger
     {
         /// <summary>
+        /// Writes a DEBUG level message
+        /// </summary>
+        /// <param name="message">Message to write</param>
+        void Debug(string message);
+
+        /// <summary>
         /// Writes an INFO level message
         /// </summary>
         /// <param name="message">Message to write</param>
