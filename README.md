@@ -4,7 +4,7 @@
 
 This is a Windows Service project that will send an email alert as the host powers on/off and drops in/out of battery power.
 
-## Initial Need
+## Initial Concept
 
 Having UPS systems in the house to keep things alive during brown- or blackouts is great.  However, excessive outtages that happen while away from the house can lead to unexpected consequences.  For example, several hundred dollars worth of food in a refrigerator can become spoiled while you are away for a weekend.
 
@@ -31,8 +31,8 @@ The immediate need was to write an application to send notices to my cell phone.
 
 Ensure the following is installed:
 
-* .NET Framework version 4.8
-* .NET Core version 3.1
+* .NET Framework version 4.8.1
+* .NET version 6
 * PowerShell (at least version 5)
 * Visual Studio (Community Edition is fine)
 * Windows Installer XML (aka _WiX_)
@@ -90,7 +90,7 @@ Where the log files are written depends on how the application is started:
 The host machine will need the following:
 
 * Windows 7 or higher (64-bit only)
-* .NET Framework version 4.8
+* .NET Framework version 4.8.1
 
 The service itself is setup to run with the following options:
 
@@ -108,16 +108,14 @@ Certain catagories have been made for future filtering/exclusions of tests.  See
 
 ## Development Suggestions
 
-Use _DebugView_ to listen for additional `Debug` level messages that are scattered through the application.  If you have Visual Studio running at the same time, then look at its _Output_ window for the debug messages -- they are not redirected back to the debug stream when caught there.
+Use [DebugView](https://learn.microsoft.com/en-us/sysinternals/downloads/debugview) app to listen for additional `Debug` level messages that are scattered through the application.  If you have Visual Studio running at the same time, then look at its _Output_ window for the debug messages -- they are not redirected back to the debug stream when caught there.
 
 ## Future Ideas
 
 In no particular order...
 
 * Improved parameterization of Serilog options with `Serilog.Settings.Configuration` and `Serilog.Sinks.Map`;
-* Dependency injection with configuration file for IoC bindings;
 * Expose REST API from for querying state, returning metrics, etc.;
-* Create base class for declaring/discovering new background worker functionality;
+* Create base class for declaring/discovering new functionality, detect and inject with IoC library;
 * Lightweight telemetry: CPU + RAM utilization;
 * Track internet uptime, send outtage notice after service is restored;
-* Look at Arduino, with a battery, and modify as needed to get a POC working on that platform.
