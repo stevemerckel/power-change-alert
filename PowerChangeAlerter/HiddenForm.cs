@@ -23,7 +23,10 @@ namespace PowerChangeAlerter
         {
             _alertManager = alertManager ?? throw new ArgumentNullException(nameof(alertManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // initialize time change tracking
             _now = DateTime.Now;
+            _stopWatch.Start();
 
             // fetch and assign current power line status and power status
             _currentPowerLineStatus = GetCurrentPowerLineStatus();
@@ -142,7 +145,7 @@ namespace PowerChangeAlerter
             PowerBroadcastStatus powerBroadcastStatus = new PowerBroadcastStatus();
             _logger.Debug($"{nameof(powerBroadcastStatus)} = {powerBroadcastStatus}");
             PowerLineStatus powerLineStatus = SystemInformation.PowerStatus.PowerLineStatus;
-            _logger.Debug($"{nameof(powerLineStatus)} = {powerLineStatus} --- Is Running Battery? {(powerLineStatus == PowerLineStatus.Offline)}");
+            _logger.Debug($"{nameof(powerLineStatus)} = {powerLineStatus}");
 
             switch (e.Mode)
             {

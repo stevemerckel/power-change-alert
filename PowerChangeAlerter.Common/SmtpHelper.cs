@@ -53,7 +53,7 @@ namespace PowerChangeAlerter.Common
             MailMessage mm = null;
             try
             {
-                _logger.Debug("Creating mail message");
+                _logger.Debug("Creating SMTP message");
                 mm = new MailMessage
                 {
                     BodyEncoding = Encoding.UTF8,
@@ -78,8 +78,8 @@ namespace PowerChangeAlerter.Common
 
                 if (_isEmailSendingAllowed)
                 {
-                    _logger.Debug("Sending message...");
                     client.Send(mm);
+                    _logger.Info("SMTP Message sent");
                 }
                 else
                 {

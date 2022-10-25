@@ -48,7 +48,7 @@ namespace PowerChangeAlerter.Common
 
             _serilog = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
-                .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
+                .WriteTo.Map("ApplicationName", "UsingDefaultAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
                 .CreateLogger();
 
             Info($"{nameof(SerilogAppLogger)} exiting.");

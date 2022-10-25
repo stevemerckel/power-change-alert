@@ -39,6 +39,7 @@ namespace PowerChangeAlerter
             // Based on article stored by Way Back Machine --> https://web.archive.org/web/20140706130218/http://connect.microsoft.com/VisualStudio/feedback/details/241133/detecting-a-wm-timechange-event-in-a-net-windows-service
             Thread t = new Thread(() => RunMessagePump(_alertManager, _logger));
             t.Start();
+            _logger.Info("Service fully started");
         }
 
         /// <summary>
@@ -52,6 +53,7 @@ namespace PowerChangeAlerter
         public void StopService()
         {
             _alertManager.ManagerStop();
+            _logger.Info("Service stopped");
             Application.Exit();
         }
 
