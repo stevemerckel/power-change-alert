@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Management;
 using System.ServiceProcess;
 using System.Text;
@@ -22,6 +23,8 @@ namespace PowerChangeAlerter.Common
         private bool _isBatteryDetected;
         private PowerLineStatus _powerSource = PowerLineStatus.Unknown;
         private volatile ISmtpHelper _smtpHelper;
+        private static DateTime _now;
+        private static readonly Stopwatch _stopWatch = new Stopwatch();
 
         private Task _taskRunningOnBattery;
         private CancellationTokenSource _ctsBattery;
@@ -38,12 +41,17 @@ namespace PowerChangeAlerter.Common
             _logger = logger;
             _fm = fileManager;
             _smtpHelper = new SmtpHelper(_rs, _logger);
+
+            // initialize time change tracking
+            _now = DateTime.Now;
+            _stopWatch.Start();
         }
 
         /// <summary>
         /// Writes uptime messages to logger
         /// </summary>
         /// <param name="state"></param>
+        [CodeEntry]
         private void LogUptime(object state)
         {
             if (!_isFirstUptimeLogged)
@@ -61,6 +69,7 @@ namespace PowerChangeAlerter.Common
         /// <summary>
         /// Whether a battery is found on the host device
         /// </summary>
+        [CodeEntry]
         private bool IsBatteryAvailable()
         {
             ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_Battery");
@@ -72,6 +81,7 @@ namespace PowerChangeAlerter.Common
         /// <summary>
         /// Writes a bunch of (possibly) useful power state information
         /// </summary>
+        [CodeEntry]
         private void DumpPowerInfo()
         {
             PowerBroadcastStatus pbs = new PowerBroadcastStatus();
@@ -93,10 +103,9 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
+        [CodeEntry]
         public void ManagerStart()
         {
-            _logger.Info($"{nameof(ManagerStart)} was hit");
-
             // write runtime startup metrics
             var currentVersion = _fm.GetExecutingAssemblyVersion();
             var sb = new StringBuilder();
@@ -137,6 +146,7 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
+        [CodeEntry]
         public void ManagerStop()
         {
             _logger.Info($"{nameof(ManagerStop)} was hit");
@@ -149,6 +159,7 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
+        [CodeEntry]
         public void NotifyPowerFromWall()
         {
             if (_taskRunningOnBattery == null)
@@ -164,6 +175,7 @@ namespace PowerChangeAlerter.Common
         }
 
         /// <inheritdoc />
+        [CodeEntry]
         public void NotifyPowerOnBattery()
         {
             if (_taskRunningOnBattery?.Status == TaskStatus.Running)
@@ -178,6 +190,7 @@ namespace PowerChangeAlerter.Common
             _taskRunningOnBattery.Start();
         }
 
+        [CodeEntry]
         private async void SendBatteryNotices(IAppLogger logger, ISmtpHelper smtp, CancellationToken token)
         {
             if (token.IsCancellationRequested)
@@ -212,18 +225,50 @@ namespace PowerChangeAlerter.Common
             }
         }
 
-        /// <inheritdoc />
-        public void NotifyTimeChange(DateTime previous, DateTime adjusted)
-        {
-            var isForward = adjusted >= previous;
-            var isDateChanged = previous.Date != adjusted.Date;
-            var previousString = isDateChanged ? previous.ToString() : previous.ToLongTimeString();
-            var adjustedString = isDateChanged ? adjusted.ToString() : adjusted.ToLongTimeString();
+        ///// <inheritdoc />
+        //public void NotifyTimeChange(DateTime previous, DateTime adjusted)
+        //{
+        //    var isForward = adjusted >= previous;
+        //    var isDateChanged = previous.Date != adjusted.Date;
+        //    var previousString = isDateChanged ? previous.ToString() : previous.ToLongTimeString();
+        //    var adjustedString = isDateChanged ? adjusted.ToString() : adjusted.ToLongTimeString();
 
-            var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
-            _logger.Info(message);
-            _logger.Debug($"{nameof(NotifyTimeChange)} - {message}");
-            _smtpHelper.Send("Time Change", message);
+        //    var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
+        //    _logger.Info(message);
+        //    _logger.Debug($"{nameof(NotifyTimeChange)} - {message}");
+        //    _smtpHelper.Send("Time Change", message);
+        //}
+
+        /// <inheritdoc />
+        public void NotifyTimeChange()
+        {
+            _stopWatch.Stop();
+            DateTime expectedDateTime;
+            lock (_lock)
+            {
+                expectedDateTime = _now.Add(_stopWatch.Elapsed);
+                _now = DateTime.Now;
+                _stopWatch.Reset();
+                _stopWatch.Start();
+            }
+
+            var isForward = _now >= expectedDateTime;
+            var isDateChanged = expectedDateTime.Date != _now.Date;
+            var previousString = isDateChanged ? expectedDateTime.ToString() : expectedDateTime.ToLongTimeString();
+            var adjustedString = isDateChanged ? _now.ToString() : _now.ToLongTimeString();
+
+            const int IgnoreThresholdInSeconds = 15;
+            var elapsedSeconds = Math.Abs((int)expectedDateTime.Subtract(DateTime.Now).TotalSeconds);
+            if (elapsedSeconds >= IgnoreThresholdInSeconds)
+            {
+                var message = $"System time moved {(isForward ? "forward" : "backward")} from {previousString} to {adjustedString}";
+                _logger.Info(message);
+                _logger.Debug($"{nameof(NotifyTimeChange)} - {message}");
+                _smtpHelper.Send("Time Change", message);
+                return;
+            }
+
+            _logger.Debug($"An insignificant time change of {elapsedSeconds} seconds was detected -- ignored because under {IgnoreThresholdInSeconds} second threshold");
         }
     }
 }

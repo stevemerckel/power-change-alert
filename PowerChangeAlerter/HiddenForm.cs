@@ -59,8 +59,7 @@ namespace PowerChangeAlerter
                 foreach (var mo in queryResults)
                 {
                     const string TargetPropertyName = "PowerOnline";
-                    var isUsingWallPower = false;
-                    var wasFound = bool.TryParse(mo[TargetPropertyName].ToString(), out isUsingWallPower);
+                    var wasFound = bool.TryParse(mo[TargetPropertyName].ToString(), out bool isUsingWallPower);
                     if (!wasFound)
                     {
                         _logger.Warn($"Could not find '{TargetPropertyName}' in WMI query results !!");
@@ -126,7 +125,8 @@ namespace PowerChangeAlerter
             var newSystemDateTime = DateTime.Now;
             var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
             _logger.Debug(msg);
-            _alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
+            //_alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
+            _alertManager.NotifyTimeChange();
         }
 
         private void HandleUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
@@ -182,7 +182,7 @@ namespace PowerChangeAlerter
 
     partial class HiddenForm
     {
-        private System.ComponentModel.IContainer components = null;
+        private readonly System.ComponentModel.IContainer components = null;
 
         protected override void Dispose(bool disposing)
         {
