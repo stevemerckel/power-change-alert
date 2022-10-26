@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -54,7 +53,7 @@ namespace PowerChangeAlerter.Common
             MailMessage mm = null;
             try
             {
-                Debug.WriteLine("Creating mail message");
+                _logger.Debug("Creating SMTP message");
                 mm = new MailMessage
                 {
                     BodyEncoding = Encoding.UTF8,
@@ -65,7 +64,7 @@ namespace PowerChangeAlerter.Common
                 };
                 mm.To.Add(new MailAddress(_runtimeSettings.EmailRecipientAddress, _runtimeSettings.EmailRecipientName ?? _runtimeSettings.EmailRecipientAddress));
 
-                Debug.WriteLine("Creating SMTP Client");
+                _logger.Debug("Creating SMTP Client");
                 client = new SmtpClient
                 {
                     Host = _runtimeSettings.EmailSmtpServer,
@@ -79,8 +78,8 @@ namespace PowerChangeAlerter.Common
 
                 if (_isEmailSendingAllowed)
                 {
-                    Debug.WriteLine("Sending message...");
                     client.Send(mm);
+                    _logger.Info("SMTP Message sent");
                 }
                 else
                 {

@@ -22,7 +22,7 @@ namespace PowerChangeAlerter
 
             try
             {
-                 targetService = new AlerterService(rs, logger, fm);
+                targetService = new AlerterService(rs, logger, fm);
             }
             catch (Exception ex)
             {
@@ -87,22 +87,20 @@ namespace PowerChangeAlerter
             }
         }
 
-        private static void RunCommandline(AlerterService targetService, IAppLogger logger)
+        [CodeEntry]
+        private static async void RunCommandline(AlerterService targetService, IAppLogger logger)
         {
             targetService.StartService();
-            Task.Run(() =>
-            {
-                targetService.TriggerStandby();
-                Thread.Sleep(5000);
-                targetService.TriggerResume();
-                Thread.Sleep(5000);
-                targetService.TriggerAcToBattery();
-                Thread.Sleep(30000);
-                Thread.Sleep(30000);
-                Thread.Sleep(20000);
-                targetService.TriggerBatteryToAc();
-                logger.Info("Done with Power tests");
-            });
+            targetService.TriggerStandby();
+            await Task.Delay(5000);
+            targetService.TriggerResume();
+            await Task.Delay(5000);
+            targetService.TriggerAcToBattery();
+            await Task.Delay(30000);
+            await Task.Delay(30000);
+            await Task.Delay(20000);
+            targetService.TriggerBatteryToAc();
+            logger.Info("Done with Power tests");
             logger.Info("  ***  Press ENTER key to stop program  ***  ");
             Console.Read();
             targetService.StopService();

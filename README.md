@@ -4,7 +4,7 @@
 
 This is a Windows Service project that will send an email alert as the host powers on/off and drops in/out of battery power.
 
-## Initial Need
+## Backstory
 
 Having UPS systems in the house to keep things alive during brown- or blackouts is great.  However, excessive outtages that happen while away from the house can lead to unexpected consequences.  For example, several hundred dollars worth of food in a refrigerator can become spoiled while you are away for a weekend.
 
@@ -13,7 +13,7 @@ The immediate need was to write an application to send notices to my cell phone.
 ## Technologies
 
 * C# Windows Service
-* .NET Framework and .NET Core
+* .NET + .NET Framework
 * SMTP Communication
 * PowerShell
 * MSI Installer
@@ -21,18 +21,18 @@ The immediate need was to write an application to send notices to my cell phone.
 
 ## NuGet Packages
 
-* Microsoft Extension packages
+* Microsoft Extension
 * Newtonsoft JSON
-* NUnit version 3.x
-* Serilog, plus several sinks
+* NUnit
+* Serilog
 * Trinet.Core.IO.Ntfs
 
 ## Development Environment Setup
 
 Ensure the following is installed:
 
-* .NET Framework version 4.8
-* .NET Core version 3.1
+* .NET Framework runtime version 4.8.1
+* .NET version 6 runtime
 * PowerShell (at least version 5)
 * Visual Studio (Community Edition is fine)
 * Windows Installer XML (aka _WiX_)
@@ -48,7 +48,7 @@ If this is your first time downloading the repo, then you will need to do an ext
 
 > If you do not do the above step, you will get an exception when you debug or run the application.  This also applies for generating a MSI file.
 
-## Application Overview
+## Source Code Overview
 
 The solution file has references to a few projects:
 
@@ -72,7 +72,7 @@ This will dump out some generalized information and ensure that the necessary ev
 
 Right-clicking on the `PowerChangeAlerter.Install` project in Visual Studio's _Solution Explorer_ will open options to rebuild that project and generate a MSI file.  For convenience, the generated MSI file is copied to the root of the repo, and will remove any other MSI files found there to eliminate confusion.  This happens as a post-build step that runs the following PowerShell script: `copy-msi-with-rename.ps1`.
 
-## Installing the Application
+## Installing
 
 Run the generated MSI file, and click through the few prompts.  If an existing copy of the service exists already, the installer will stop and remove the existing service, then replace it with the installer's version.
 
@@ -85,12 +85,12 @@ Where the log files are written depends on how the application is started:
 * **Visual Studio Debugging or Command-line -** Look for a `logs` directory under the runtime's EXE location, usually in the `bin` directory
 * **Registered as a Windows Service -** `C:\ProgramData\Power Change Alerter\logs`
 
-## Running the Windows Service
+## Running the Service
 
 The host machine will need the following:
 
 * Windows 7 or higher (64-bit only)
-* .NET Framework version 4.8
+* .NET Framework version 4.8.1
 
 The service itself is setup to run with the following options:
 
@@ -100,24 +100,29 @@ The service itself is setup to run with the following options:
 
 Starting the service will dump several lines of initialization information.  If you get any failures during startup, check the log files written to the location specified in the _Logging_ section above.  After the service has been running for a while, you will periodically see some "uptime minutes" messages being written to the log file.
 
-## Unit and Integration Tests
+## Tests
 
 The _PowerChangeAlerter.Tests_ project contains all of the unit and integration tests.  When you load the solution, look for a Solution Folder called _Test Projects_.
 
 Certain catagories have been made for future filtering/exclusions of tests.  See the `CategoryNames.cs` file for those values.
 
-## Development Suggestions
+## Notes
 
-Use _DebugView_ to listen for additional `Debug` level messages that are scattered through the application.  If you have Visual Studio running at the same time, then look at its _Output_ window for the debug messages -- they are not redirected back to the debug stream when caught there.
+Use [DebugView](https://learn.microsoft.com/en-us/sysinternals/downloads/debugview) app to listen for additional `Debug` level messages that are scattered through the application.  If you have Visual Studio running at the same time, then look at its _Output_ window for the debug messages -- they are not redirected back to the debug stream when caught there.
 
-## Future Ideas
+If you get service startup failures and do not see a log file (or new log lines), check Windows Event Viewer for errors.
+
+If the installer raises an error about insufficient privileges or permissions, then try one of the following:
+
+* Copy the file locally, and ensure the file is not blocked ([more info](https://www.thewindowsclub.com/fix-windows-blocked-access-file))
+* Ensure that the "Services" window is not open (i.e. from Run dialog --> `services.msc`)
+
+## Future
 
 In no particular order...
 
 * Improved parameterization of Serilog options with `Serilog.Settings.Configuration` and `Serilog.Sinks.Map`;
-* Dependency injection with configuration file for IoC bindings;
 * Expose REST API from for querying state, returning metrics, etc.;
-* Create base class for declaring/discovering new background worker functionality;
-* Lightweight telemetry: CPU + RAM utilization;
-* Track internet uptime, send outtage notice after service is restored;
-* Look at Arduino, with a battery, and modify as needed to get a POC working on that platform.
+* Create base class for declaring/discovering new functionality, detect and inject with IoC library;
+* Capture instrumentation metrics;
+* Track internet uptime, send outtage notice after service is restored.

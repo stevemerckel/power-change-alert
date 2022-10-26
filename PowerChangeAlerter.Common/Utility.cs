@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -25,7 +24,7 @@ namespace PowerChangeAlerter.Common
         /// <returns>The generated random string</returns>
         public static string MakeRandomString(int length, bool includeLowerCase = false, bool includeNumbers = false)
         {
-            if (length < 0)
+            if (length < 1)
                 throw new ArgumentException("Length must be greater than 0 !!");
 
             string[] capitals = { "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "M", "N", "P", "R", "T", "U", "V", "W", "X", "Y" };

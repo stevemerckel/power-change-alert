@@ -14,10 +14,10 @@ namespace PowerChangeAlerter.Tests.Unit
         /// <remarks>
         /// For the string length, make sure you use a very large pool size!
         /// </remarks>
-        [TestCase(200, false, false)]
-        [TestCase(225, false, true)]
-        [TestCase(250, true, false)]
-        [TestCase(275, true, true)]
+        [TestCase(300, false, false)]
+        [TestCase(300, false, true)]
+        [TestCase(300, true, false)]
+        [TestCase(300, true, true)]
         public void Test_MakeRandomString_ValidateInputFlags_Success(int stringLength, bool includeLowerCase, bool includeNumbers)
         {
             // create the random string
@@ -44,6 +44,30 @@ namespace PowerChangeAlerter.Tests.Unit
                 Assert.IsTrue(characters.Any(x => char.IsDigit(x)), $"No numbers found at all!! -- {generated}");
             else
                 Assert.IsTrue(characters.All(x => !char.IsDigit(x)), $"Found numbers, but was told not to include them!! -- {generated}");
+        }
+
+        [TestCase(0, false, false)]
+        [TestCase(0, true, false)]
+        [TestCase(0, false, true)]
+        [TestCase(0, true, true)]
+        [TestCase(-1, false, false)]
+        [TestCase(-1, true, false)]
+        [TestCase(-1, false, true)]
+        [TestCase(-1, true, true)]
+        [TestCase(int.MinValue, false, false)]
+        [TestCase(int.MinValue, true, false)]
+        [TestCase(int.MinValue, false, true)]
+        [TestCase(int.MinValue, true, true)]
+        public void Test_MakeRandomString_LessThanOneCharThrows_Fail(int stringLength, bool includeLowerCase, bool includeNumbers)
+        {
+            Assert.Throws<ArgumentException>(() => Utility.MakeRandomString(stringLength, includeLowerCase, includeNumbers));
+        }
+
+        [Test]
+        public void Test_CodeEntryAttribute_Success()
+        {
+            var codeEntryAttribute = new CodeEntryAttribute();
+            Assert.AreEqual(1, codeEntryAttribute.HitCount);
         }
     }
 }

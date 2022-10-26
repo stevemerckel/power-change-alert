@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -28,8 +27,8 @@ namespace PowerChangeAlerter.Common
 
             var serilogConfigFileLocation = fileManager.PathCombine(fileManager.PathGetDirectoryName(Assembly.GetExecutingAssembly().Location), "settings.serilog");
             var isConfigFound = fileManager.FileExists(serilogConfigFileLocation);
-            Debug.WriteLine($"Looking for Serilog config here: {serilogConfigFileLocation}");
-            Debug.WriteLine($"Serilog config was {(isConfigFound ? string.Empty : "**NOT** ")}found");
+            System.Diagnostics.Debug.WriteLine($"Looking for Serilog config here: {serilogConfigFileLocation}");
+            System.Diagnostics.Debug.WriteLine($"Serilog config was {(isConfigFound ? string.Empty : "**NOT** ")}found");
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile(serilogConfigFileLocation)
                 .Build();
@@ -45,11 +44,11 @@ namespace PowerChangeAlerter.Common
             if (logDirectory.EndsWith("/"))
                 logDirectory = logDirectory.TrimEnd('/');
 
-            Debug.WriteLine($"Log directory = {logDirectory}");
+            System.Diagnostics.Debug.WriteLine($"Log directory = {logDirectory}");
 
             _serilog = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
-                .WriteTo.Map("ApplicationName", "MyOtherAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
+                .WriteTo.Map("ApplicationName", "UsingDefaultAppName", (name, wt) => wt.File($"{logDirectory}/log-{name}.txt"))
                 .CreateLogger();
 
             Info($"{nameof(SerilogAppLogger)} exiting.");
@@ -58,29 +57,35 @@ namespace PowerChangeAlerter.Common
         /// <inheritdoc />
         public void Info(string message)
         {
-            Debug.WriteLine($"[{nameof(Info)}] - {message}");
+            System.Diagnostics.Debug.WriteLine($"[{nameof(Info)}] - {message}");
             _serilog.Information(message);
         }
 
         /// <inheritdoc />
         public void Warn(string message)
         {
-            Debug.WriteLine($"[{nameof(Warn)}] - {message}");
+            System.Diagnostics.Debug.WriteLine($"[{nameof(Warn)}] - {message}");
             _serilog.Warning(message);
         }
 
         /// <inheritdoc />
         public void Error(string message)
         {
-            Debug.WriteLine($"[{nameof(Error)}] - {message}");
+            System.Diagnostics.Debug.WriteLine($"[{nameof(Error)}] - {message}");
             _serilog.Error(message);
         }
 
         /// <inheritdoc />
         public void Critical(string message)
         {
-            Debug.WriteLine($"[{nameof(Critical)}] - {message}");
+            System.Diagnostics.Debug.WriteLine($"[{nameof(Critical)}] - {message}");
             _serilog.Fatal(message);
+        }
+
+        /// <inheritdoc />
+        public void Debug(string message)
+        {
+            _serilog.Debug(message);
         }
     }
 }

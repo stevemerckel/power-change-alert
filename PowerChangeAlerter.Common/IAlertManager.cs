@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PowerChangeAlerter.Common
+﻿namespace PowerChangeAlerter.Common
 {
     /// <summary>
     /// Primary contracts for working with the alert system
@@ -8,11 +6,12 @@ namespace PowerChangeAlerter.Common
     public interface IAlertManager
     {
         /// <summary>
-        /// Notifies that a time change happened, changing from <paramref name="previous"/> to <paramref name="adjusted"/> (as local datetime)
+        /// Notifies that a time change happened and will decide whether to act on the change
         /// </summary>
-        /// <param name="previous">The previous datetime</param>
-        /// <param name="adjusted">The new datetime</param>
-        void NotifyTimeChange(DateTime previous, DateTime adjusted);
+        ///// <param name="previous">The previous datetime</param>
+        ///// <param name="adjusted">The new datetime</param>
+        void NotifyTimeChange();
+        //void NotifyTimeChange(DateTime previous, DateTime adjusted);
 
         /// <summary>
         /// Notifies alert manager that power changed to device battery
