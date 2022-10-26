@@ -76,7 +76,10 @@ namespace PowerChangeAlerter
                 // For now we will assume wall power, and set the return value to that status.
                 // Note: Querying "BatteryStatus" throws in this case, but "Win32_Battery" does not.
                 // REFACTOR: See if there is a more elegant way to interrogate and fall-through.
-                _logger.Warn($"Failed to enumerate query results -- reason: {managementEx}");
+                var msg = $"Failed to enumerate query results -- reason: {managementEx}";
+                if (managementEx.InnerException != null)
+                    msg += $" --- Inner Exception: {managementEx.InnerException}";
+                _logger.Warn(msg);
                 status = PowerLineStatus.Online;
             }
 
@@ -104,28 +107,6 @@ namespace PowerChangeAlerter
         [CodeEntry]
         private void HandleTimeChanged(object sender, EventArgs e)
         {
-            _stopWatch.Stop();
-            DateTime previousSystemDateTime;
-            lock (_lock)
-            {
-                previousSystemDateTime = _now.Add(_stopWatch.Elapsed);
-                _now = DateTime.Now;
-                _stopWatch.Reset();
-                _stopWatch.Start();
-            }
-
-            const int ThresholdInSeconds = 15;
-            int deltaSeconds = Math.Abs((int)previousSystemDateTime.Subtract(DateTime.Now).TotalSeconds);
-            if (deltaSeconds < ThresholdInSeconds)
-            {
-                _logger.Debug($"An insignificant time change of {deltaSeconds} seconds was detected -- ignored because under {ThresholdInSeconds} second threshold");
-                return;
-            }
-
-            var newSystemDateTime = DateTime.Now;
-            var msg = $"{nameof(HandleTimeChanged)} from {previousSystemDateTime} to {newSystemDateTime:MM/dd/yyyy hh:mm:ss tt}";
-            _logger.Debug(msg);
-            //_alertManager.NotifyTimeChange(previousSystemDateTime, newSystemDateTime);
             _alertManager.NotifyTimeChange();
         }
 
